@@ -2,6 +2,7 @@ package Complaint.Complaint;
 
 import Complaint.Controller.ComplaintController;
 import Complaint.Request.ComplaintLogRequest;
+import Complaint.Request.ComplaintTransLogRequest;
 import Complaint.Service.ComplaintTransactionService;
 import Complaint.Service.CustomerComplaintService;
 import org.json.simple.JSONObject;
@@ -22,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-@ContextConfiguration(classes = {ComplaintController.class,ComplaintLogRequest.class,CustomerComplaintService.class,ComplaintTransactionService.class })
+@ContextConfiguration(classes = {ComplaintController.class,ComplaintLogRequest.class, ComplaintTransLogRequest.class })
 @WebMvcTest
 @AutoConfigureMockMvc
 public class ComplaintLogTest {
@@ -34,9 +35,16 @@ public class ComplaintLogTest {
     MockMvc mockmvc;
 
 
+    //@Test
+    void testComplaintTransLog (){
+        JSONObject obj = new JSONObject();
+        obj.put("tid","T00001");
+        obj.put("recall_reason","Made a mistake Wrong transaction.");
+
+        testComplaintTransLogRequest(obj);
+    }
     @Test
-    void testCreateAccount() {
-        ComplaintLogRequest complaintLogRequest = new ComplaintLogRequest();
+    void testComplaintLog() {
         JSONObject obj = new JSONObject();
         obj.put("customer_id","C00002");
         obj.put("transactionId","T00002");
@@ -44,15 +52,36 @@ public class ComplaintLogTest {
         obj.put("createdBy","Test user-staff");
         obj.put("updatedBy","none");
 
-       testGetAccount_statement(obj);
+        testLogCustomerComplaint(obj);
     }
-    private void testGetAccount_statement(JSONObject obj) {
+
+    private void testLogCustomerComplaint(JSONObject obj) {
 
         try {
             MvcResult mvcr = mockmvc.perform(MockMvcRequestBuilders
-                    .post("/complaint/log").content(obj.toString())
-                    .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-                    .andDo(print()).andReturn();
+                    .post("/complaint/log")
+                    .content(obj.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andReturn();
+            mvcr.getResponse();
+            assertNotNull(mvcr.getResponse());
+            assertEquals(200, mvcr.getResponse().getStatus());
+        } catch (Exception e) {
+            e.getMessage();
+        }
+    }
+
+    private void testComplaintTransLogRequest(JSONObject obj){
+        try {
+            MvcResult mvcr = mockmvc.perform(MockMvcRequestBuilders
+                    .post("/complaint/trans/recall/request")
+                    .content(obj.toString())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON))
+                    .andDo(print())
+                    .andReturn();
             mvcr.getResponse();
             assertNotNull(mvcr.getResponse());
             assertEquals(200, mvcr.getResponse().getStatus());

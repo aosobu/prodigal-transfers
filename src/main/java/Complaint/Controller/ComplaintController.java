@@ -4,6 +4,7 @@ import Complaint.Entity.CustomerComplaint;
 import Complaint.Entity.TransactionComplaint;
 import Complaint.Enum.ComplaintState;
 import Complaint.Request.ComplaintLogRequest;
+import Complaint.Request.ComplaintTransLogRequest;
 import Complaint.Service.ComplaintTransactionService;
 import Complaint.Service.CustomerComplaintService;
 import lombok.extern.slf4j.Slf4j;
@@ -17,12 +18,17 @@ import java.sql.Date;
 @RestController
 @RequestMapping("/complaint")
 public class ComplaintController {
-    @Autowired
+
     private CustomerComplaintService customerComplaintService;
-    @Autowired
     private ComplaintTransactionService complaintTransactionService;
+
+    @Autowired
+    public ComplaintController(CustomerComplaintService customerComplaintService, ComplaintTransactionService complaintTransactionService){
+        this.customerComplaintService = customerComplaintService;
+        this.complaintTransactionService = complaintTransactionService;
+    }
     @PostMapping("/log")
-    public ResponseEntity<?> logComplaint(@RequestBody ComplaintLogRequest complaintLogRequest){
+    public ResponseEntity<?> logCustomerComplaint(@RequestBody ComplaintLogRequest complaintLogRequest){
         if(complaintLogRequest ==null | complaintLogRequest.getCustomer_id().isEmpty() |complaintLogRequest.getComplaint_message().isEmpty()
         |complaintLogRequest.getCreatedBy().isEmpty() | complaintLogRequest.getTransactionId().isEmpty()){
             log.info("Incomplete requested information.");
@@ -43,12 +49,35 @@ public class ComplaintController {
         log.info("Logged complaint for customer success");
 
         log.info("Logging complaint transaction for customer {}",complaintLogRequest.getCustomer_id());
-        TransactionComplaint transactionComplaint = new TransactionComplaint();
-        transactionComplaint.setCustomer_id(complaintLogRequest.getCustomer_id());
-        transactionComplaint.setTid(complaintLogRequest.getTransactionId());
-        complaintTransactionService.saveTransactionComolaint(transactionComplaint);
+        TransactionComplaint transactionComplaint = new TransactionComplaint(0L,complaintLogRequest.getCustomer_id(),complaintLogRequest.getTransactionId());
+        complaintTransactionService.saveTransactionComplaint(transactionComplaint);
         log.info("Logged complaint transaction for customer success");
 
         return new ResponseEntity<>("Customer's Transaction Complaint logged Successfully.", HttpStatus.OK);
+    }
+    @PostMapping("/trans/recall/request")
+    public ResponseEntity<?> logTransactionRecall(@RequestBody ComplaintTransLogRequest complaintTransLogRequest){
+
+        if(complaintTransLogRequest ==null){
+            return new ResponseEntity<>("Error with passed information",HttpStatus.BAD_REQUEST);
+        }
+        //All customer's transactions should be queried from Profectus as called from Finacle.
+        // And then get the specific complaint transaction
+        TransactionComplaint transactionComplaint =complaintTransactionService.findByTransID(complaintTransLogRequest.getTid());
+
+        if (transactionComplaint==null){
+            return new ResponseEntity<>("Transaction Not Found",HttpStatus.NOT_FOUND);
+        }
+        log.info("Transaction with ID: {} was found.",transactionComplaint.getTid());
+        // get customer complaint message
+        String complaint_message =customerComplaintService.getTransComplaintMessageByTid(transactionComplaint.getTid());
+        if(complaint_message==null){
+            return new ResponseEntity<>("No Transaction recall reason logged by customer",HttpStatus.NOT_FOUND);
+        }
+
+        log.info("Customer Transaction recall reason: {}",complaint_message);
+        log.info("Bank staff Transaction recall reason: {}",complaintTransLogRequest.getRecall_reason());
+        //Trigger the email service to send email notification as referenced in the Doc- Bank Operations No. 2
+        return  new ResponseEntity<>("Email sent",HttpStatus.OK);
     }
 }

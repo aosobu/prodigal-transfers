@@ -16,5 +16,8 @@ public class CustomerComplaintService {
         customerComplaintRepo.saveComplaint(customerComplaint.getCustomer_id(), customerComplaint.getComplaint_message(),
                 customerComplaint.getCreatedBy(), customerComplaint.getCreatedDate(),customerComplaint.getComplaintState(), customerComplaint.getUpdatedBy());
     }
+    public String getTransComplaintMessageByTid(String tid){
+        return  customerComplaintRepo.getTransComplaintMessageByTid(tid);
+    }
 
 }
