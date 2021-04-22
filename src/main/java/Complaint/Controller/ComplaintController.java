@@ -4,17 +4,21 @@ import Complaint.Entity.CustomerComplaint;
 import Complaint.Entity.TransactionComplaint;
 import Complaint.Enum.ComplaintState;
 import Complaint.Enum.TransferRecallType;
-import Complaint.Request.ComplaintLogRequest;
-import Complaint.Request.ComplaintTransLogRequest;
+import Complaint.ApiRequestModel.ComplaintLogRequest;
+import Complaint.ApiRequestModel.ComplaintTransLogRequest;
 import Complaint.Service.ComplaintTransactionService;
 import Complaint.Service.CustomerComplaintService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Date;
+
 @Slf4j
 @RestController
 @RequestMapping("/complaint")
@@ -65,28 +69,39 @@ public class ComplaintController {
         }
         log.info("Transaction with ID: {} was found.",transactionComplaint.getTransaction_id());
         // get customer complaint message
-        String complaint_message =customerComplaintService.getTransComplaintMessageByTid(transactionComplaint.getTransaction_id());
-        if(complaint_message==null){
+
+
+        String queryResult = customerComplaintService.getTransComplaintMessageByTid(transactionComplaint.getTransaction_id());
+
+        if(queryResult==null){
             return new ResponseEntity<>("No Transaction recall reason logged by customer",HttpStatus.NOT_FOUND);
         }
+        String[] splitted_string = queryResult.split(",");
+
+        String complaint_message, transfer_type;
+
+        complaint_message = splitted_string[0].trim();
+        transfer_type = splitted_string[1].trim();
 
         log.info("Customer Transaction recall reason: {}",complaint_message);
         log.info("Bank staff Transaction recall reason: {}",complaintTransLogRequest.getRecall_reason());
-        if(transactionComplaint.getTransfer_type().equalsIgnoreCase(complaintTransLogRequest.getTransfer_type()) && transactionComplaint.getTransfer_type().equalsIgnoreCase(TransferRecallType.INTRA.name())){
-        //Trigger the email service to send email notification for INWARD TRANSACTION RECALL
+
+        if( complaintTransLogRequest.getTransfer_type().equalsIgnoreCase(transfer_type) && transfer_type.equalsIgnoreCase(TransferRecallType.INTRA.name())){
+
+            //Trigger the email service to send email notification for INWARD TRANSACTION RECALL
             // Perform Lien operations
+
             log.info("Email sent for INTRA Bank transfer.");
-        }else{
-            new ResponseEntity<>("Invalid transfer type", HttpStatus.BAD_REQUEST);
-        }
-        if(transactionComplaint.getTransfer_type().equalsIgnoreCase(complaintTransLogRequest.getTransfer_type()) && transactionComplaint.getTransfer_type().equalsIgnoreCase(TransferRecallType.INTER.name())){
+            return  new ResponseEntity<>("Email sent for INTRA Bank transfer.",HttpStatus.OK);
+        }else if( complaintTransLogRequest.getTransfer_type().equalsIgnoreCase(transfer_type) && transfer_type.equalsIgnoreCase(TransferRecallType.INTER.name())){
+
             //Trigger the email service to send email notification for OUTWARD TRANSACTION RECALL
             // Perform post email response Operations
-            log.info("Email sent for INTER Bank transfer.");
-        }else{
-            new ResponseEntity<>("Invalid transfer type", HttpStatus.BAD_REQUEST);
-        }
 
-        return  new ResponseEntity<>("Email sent",HttpStatus.OK);
+            log.info("Email sent for INTER Bank transfer.");
+            return  new ResponseEntity<>("Email sent for INTER Bank transfer.",HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>("Invalid transfer type", HttpStatus.BAD_REQUEST);
+        }
     }
 }

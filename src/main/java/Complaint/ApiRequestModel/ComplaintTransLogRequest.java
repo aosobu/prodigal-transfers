@@ -1,4 +1,4 @@
-package Complaint.Request;
+package Complaint.ApiRequestModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
