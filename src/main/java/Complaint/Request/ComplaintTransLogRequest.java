@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ComplaintTransLogRequest {
-    private String tid;
+    private String transactionId;
+    private String transfer_type;
     private String recall_reason;
 }

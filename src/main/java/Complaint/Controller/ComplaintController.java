@@ -3,6 +3,7 @@ package Complaint.Controller;
 import Complaint.Entity.CustomerComplaint;
 import Complaint.Entity.TransactionComplaint;
 import Complaint.Enum.ComplaintState;
+import Complaint.Enum.TransferRecallType;
 import Complaint.Request.ComplaintLogRequest;
 import Complaint.Request.ComplaintTransLogRequest;
 import Complaint.Service.ComplaintTransactionService;
@@ -34,22 +35,16 @@ public class ComplaintController {
             log.info("Incomplete requested information.");
             return new ResponseEntity<>("Incomplete requested information.", HttpStatus.BAD_REQUEST);
         }
-        CustomerComplaint customerComplaint = new CustomerComplaint();
-
-        customerComplaint.setCustomer_id(complaintLogRequest.getCustomer_id());
-        customerComplaint.setComplaint_message(complaintLogRequest.getComplaint_message());
-        customerComplaint.setCreatedBy(complaintLogRequest.getCreatedBy());
         Date created_date = new Date(new java.util.Date().getTime());
-        customerComplaint.setCreatedDate(created_date);
-        customerComplaint.setUpdatedBy(complaintLogRequest.getUpdatedBy());
-        customerComplaint.setComplaintState(ComplaintState.NEW.toString());
+        CustomerComplaint customerComplaint = new CustomerComplaint(0L, complaintLogRequest.getCustomer_id(), complaintLogRequest.getComplaint_message(), created_date, complaintLogRequest.getCreatedBy(), complaintLogRequest.getUpdatedBy(), ComplaintState.NEW.toString());
 
         log.info("Logging complaint for customer {}",customerComplaint.getCustomer_id());
         customerComplaintService.SaveCustomerComplaint(customerComplaint);
         log.info("Logged complaint for customer success");
 
+
         log.info("Logging complaint transaction for customer {}",complaintLogRequest.getCustomer_id());
-        TransactionComplaint transactionComplaint = new TransactionComplaint(0L,complaintLogRequest.getCustomer_id(),complaintLogRequest.getTransactionId());
+        TransactionComplaint transactionComplaint = new TransactionComplaint(null,complaintLogRequest.getCustomer_id(),complaintLogRequest.getTransactionId(),complaintLogRequest.getTransferType());
         complaintTransactionService.saveTransactionComplaint(transactionComplaint);
         log.info("Logged complaint transaction for customer success");
 
@@ -63,21 +58,35 @@ public class ComplaintController {
         }
         //All customer's transactions should be queried from Profectus as called from Finacle.
         // And then get the specific complaint transaction
-        TransactionComplaint transactionComplaint =complaintTransactionService.findByTransID(complaintTransLogRequest.getTid());
+        TransactionComplaint transactionComplaint =complaintTransactionService.findByTransID(complaintTransLogRequest.getTransactionId());
 
         if (transactionComplaint==null){
             return new ResponseEntity<>("Transaction Not Found",HttpStatus.NOT_FOUND);
         }
-        log.info("Transaction with ID: {} was found.",transactionComplaint.getTid());
+        log.info("Transaction with ID: {} was found.",transactionComplaint.getTransaction_id());
         // get customer complaint message
-        String complaint_message =customerComplaintService.getTransComplaintMessageByTid(transactionComplaint.getTid());
+        String complaint_message =customerComplaintService.getTransComplaintMessageByTid(transactionComplaint.getTransaction_id());
         if(complaint_message==null){
             return new ResponseEntity<>("No Transaction recall reason logged by customer",HttpStatus.NOT_FOUND);
         }
 
         log.info("Customer Transaction recall reason: {}",complaint_message);
         log.info("Bank staff Transaction recall reason: {}",complaintTransLogRequest.getRecall_reason());
-        //Trigger the email service to send email notification as referenced in the Doc- Bank Operations No. 2
+        if(transactionComplaint.getTransfer_type().equalsIgnoreCase(complaintTransLogRequest.getTransfer_type()) && transactionComplaint.getTransfer_type().equalsIgnoreCase(TransferRecallType.INTRA.name())){
+        //Trigger the email service to send email notification for INWARD TRANSACTION RECALL
+            // Perform Lien operations
+            log.info("Email sent for INTRA Bank transfer.");
+        }else{
+            new ResponseEntity<>("Invalid transfer type", HttpStatus.BAD_REQUEST);
+        }
+        if(transactionComplaint.getTransfer_type().equalsIgnoreCase(complaintTransLogRequest.getTransfer_type()) && transactionComplaint.getTransfer_type().equalsIgnoreCase(TransferRecallType.INTER.name())){
+            //Trigger the email service to send email notification for OUTWARD TRANSACTION RECALL
+            // Perform post email response Operations
+            log.info("Email sent for INTER Bank transfer.");
+        }else{
+            new ResponseEntity<>("Invalid transfer type", HttpStatus.BAD_REQUEST);
+        }
+
         return  new ResponseEntity<>("Email sent",HttpStatus.OK);
     }
 }

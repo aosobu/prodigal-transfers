@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ComplaintTransactionRepo extends JpaRepository<TransactionComplaint, Long> {
-@Query(value = "SELECT * FROM complaint_transaction ct where ct.tid = :tid", nativeQuery = true)
-    public TransactionComplaint findByTransID(@Param("tid") String tid);
+@Query(value = "SELECT * FROM complaint_transaction ct where ct.transaction_id = :transaction_id", nativeQuery = true)
+    public TransactionComplaint findByTransID(@Param("transaction_id") String tid);
 }

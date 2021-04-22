@@ -14,6 +14,7 @@ import java.sql.Date;
 public class ComplaintLogRequest {
     private String customer_id;
     private String transactionId;
+    private String transferType;
     private String complaint_message;
     private String createdBy;
     private String updatedBy;
