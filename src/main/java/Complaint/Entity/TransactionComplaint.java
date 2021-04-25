@@ -19,7 +19,7 @@ public class TransactionComplaint implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="cust_id", nullable = false)
+    @Column(name="customer_id", nullable = false)
     private String customer_id;
     @Column(name="transaction_id", unique = true)
     private String transaction_id;

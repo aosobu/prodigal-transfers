@@ -1,10 +1,12 @@
 package Complaint.Complaint;
 
+import Complaint.ApiRequestModel.ComplaintLogRequest;
+import Complaint.ApiRequestModel.ComplaintTransLogRequest;
 import Complaint.Controller.ComplaintController;
 import Complaint.Entity.CustomerComplaint;
 import Complaint.Entity.TransactionComplaint;
 import Complaint.Enum.ComplaintState;
-import Complaint.ApiRequestModel.ComplaintLogRequest;
+import Complaint.Repository.CustomerComplaintRepo;
 import Complaint.Service.ComplaintTransactionService;
 import Complaint.Service.CustomerComplaintService;
 import org.json.simple.JSONObject;
@@ -29,17 +31,21 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-@ContextConfiguration(classes = {ComplaintController.class,ComplaintLogRequest.class})
+@ContextConfiguration(classes = {ComplaintController.class,ComplaintLogRequest.class, ComplaintTransLogRequest.class,ComplaintTransactionService.class})
 @WebMvcTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ComplaintLogTest {
     @MockBean
+    private ComplaintTransLogRequest complaintTransLogRequest;
+    @MockBean
     private CustomerComplaintService customerComplaintService;
     @MockBean
-    private ComplaintTransactionService complaintTransactionService;
+    private ComplaintTransactionService complaintTransactionService ;
     @MockBean
-    public TransactionComplaint transactionComplaint;
+    private CustomerComplaintRepo customerComplaintRepo;
+    /*@MockBean
+    public TransactionComplaint transactionComplaint;*/
     @MockBean
     private CustomerComplaint customerComplaint;
 
@@ -47,16 +53,14 @@ public class ComplaintLogTest {
     private ComplaintState complaintState;
 
     @Autowired
-    public ComplaintLogTest(MockMvc mockmvc){
-       this.mockmvc = mockmvc;
-    }
+    public ComplaintLogTest(MockMvc mockmvc){ this.mockmvc = mockmvc; }
     @Before
-    private void initTransactionlog(){
+    public void initTransactionlog(){
         Date created_date = new Date(new java.util.Date().getTime());
         CustomerComplaint customerComplaint = new CustomerComplaint(0L, "C00001","I made a mistake with sending my transaction to one Mr. Shark Frank" , created_date, "Jernice Lee", "Maria Anderson", ComplaintState.NEW.toString());
         customerComplaintService.SaveCustomerComplaint(customerComplaint);
 
-        transactionComplaint = new TransactionComplaint(null,"C00001","T00001","inter");
+        TransactionComplaint transactionComplaint = new TransactionComplaint(null,"C00001","T00001","inter");
         complaintTransactionService.saveTransactionComplaint(transactionComplaint);
         //Get returned transaction from DB
         }
@@ -98,14 +102,13 @@ public class ComplaintLogTest {
         obj.put("transactionId","T00001");
         obj.put("transfer_type","inter");
         obj.put("recall_reason","Made a mistake. Wrong transaction.");
-
         testComplaintTransLogRequest(obj);
     }
     public void testComplaintTransLogRequest(JSONObject obj){
         try {
             MvcResult mvcr = mockmvc.perform(MockMvcRequestBuilders
                     .post("/complaint/trans/recall/request")
-                    .content(obj.toString())
+                    .content(obj.toJSONString())
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
                     .andDo(print())

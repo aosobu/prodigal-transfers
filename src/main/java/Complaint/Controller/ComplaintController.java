@@ -1,21 +1,20 @@
 package Complaint.Controller;
 
+import Complaint.ApiRequestModel.ComplaintLogRequest;
+import Complaint.ApiRequestModel.ComplaintTransLogRequest;
+import Complaint.DTO.ComplaintTransferQueryModel;
 import Complaint.Entity.CustomerComplaint;
 import Complaint.Entity.TransactionComplaint;
 import Complaint.Enum.ComplaintState;
 import Complaint.Enum.TransferRecallType;
-import Complaint.ApiRequestModel.ComplaintLogRequest;
-import Complaint.ApiRequestModel.ComplaintTransLogRequest;
 import Complaint.Service.ComplaintTransactionService;
+import Complaint.Service.ComplaintTransferService;
 import Complaint.Service.CustomerComplaintService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
 
@@ -26,11 +25,13 @@ public class ComplaintController {
 
     private CustomerComplaintService customerComplaintService;
     private ComplaintTransactionService complaintTransactionService;
+    private ComplaintTransferService complaintTransferService;
 
     @Autowired
-    public ComplaintController(CustomerComplaintService customerComplaintService, ComplaintTransactionService complaintTransactionService){
+    public ComplaintController(CustomerComplaintService customerComplaintService, ComplaintTransactionService complaintTransactionService,ComplaintTransferService complaintTransferService){
         this.customerComplaintService = customerComplaintService;
         this.complaintTransactionService = complaintTransactionService;
+        this.complaintTransferService = complaintTransferService;
     }
     @PostMapping("/log")
     public ResponseEntity<?> logCustomerComplaint(@RequestBody ComplaintLogRequest complaintLogRequest){
@@ -65,13 +66,11 @@ public class ComplaintController {
         TransactionComplaint transactionComplaint =complaintTransactionService.findByTransID(complaintTransLogRequest.getTransactionId());
 
         if (transactionComplaint==null){
-            return new ResponseEntity<>("Transaction Not Found",HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("Transaction Not Found: "+complaintTransLogRequest.getTransactionId(),HttpStatus.NOT_FOUND);
         }
         log.info("Transaction with ID: {} was found.",transactionComplaint.getTransaction_id());
-        // get customer complaint message
 
-
-        String queryResult = customerComplaintService.getTransComplaintMessageByTid(transactionComplaint.getTransaction_id());
+        String queryResult = customerComplaintService.getTransComplaintMessageAndTransferTypeByTid(transactionComplaint.getTransaction_id());
 
         if(queryResult==null){
             return new ResponseEntity<>("No Transaction recall reason logged by customer",HttpStatus.NOT_FOUND);
@@ -103,5 +102,16 @@ public class ComplaintController {
         }else{
             return new ResponseEntity<>("Invalid transfer type", HttpStatus.BAD_REQUEST);
         }
+    }
+    @GetMapping("/transfer")
+    public ResponseEntity<?> getcomplaintTransfer(@RequestParam("customer_id") String customer_id, @RequestParam("transaction_id") String transaction_id){
+      if(customer_id.isEmpty() || transaction_id.isEmpty()){
+          return new ResponseEntity<>("Error with passed information",HttpStatus.BAD_REQUEST);
+        }
+        ComplaintTransferQueryModel complaintTransferQueryModel = complaintTransferService.getComplaintTransferDetails(customer_id,transaction_id);
+      if(complaintTransferQueryModel == null){
+          return new ResponseEntity<>("Transfer Details not found.",HttpStatus.NOT_FOUND);
+      }
+        return new ResponseEntity<>(complaintTransferQueryModel,HttpStatus.OK);
     }
 }
