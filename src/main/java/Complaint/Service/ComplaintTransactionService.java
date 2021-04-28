@@ -1,7 +1,7 @@
-package Complaint.Service;
+package Complaint.service;
 
-import Complaint.Entity.TransactionComplaint;
-import Complaint.Repository.ComplaintTransactionRepo;
+import Complaint.entity.ComplaintTransaction;
+import Complaint.repository.ComplaintTransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,16 +11,13 @@ import javax.transaction.Transactional;
 @Transactional
 public class ComplaintTransactionService {
 
-    private ComplaintTransactionRepo complaintTransactionRepo;
+    private ComplaintTransactionRepository complaintTransactionRepository;
 
     @Autowired
-    public ComplaintTransactionService(ComplaintTransactionRepo complaintTransactionRepo){
-        this.complaintTransactionRepo = complaintTransactionRepo;
+    public ComplaintTransactionService(ComplaintTransactionRepository complaintTransactionRepository){
+        this.complaintTransactionRepository = complaintTransactionRepository;
     }
-    public void saveTransactionComplaint(TransactionComplaint transactionComplaint){
-        complaintTransactionRepo.save(transactionComplaint);
-    }
-    public TransactionComplaint findByTransID(String trans_Id){
-        return complaintTransactionRepo.findByTransID(trans_Id);
+    public void saveTransactionComplaint(ComplaintTransaction complaintTransaction){
+        complaintTransactionRepository.save(complaintTransaction);
     }
 }

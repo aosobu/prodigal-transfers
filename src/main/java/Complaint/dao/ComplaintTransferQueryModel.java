@@ -1,4 +1,4 @@
-package Complaint.DTO;
+package Complaint.dao;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;

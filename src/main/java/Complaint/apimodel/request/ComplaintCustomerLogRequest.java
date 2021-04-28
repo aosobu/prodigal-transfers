@@ -1,4 +1,4 @@
-package Complaint.ApiRequestModel;
+package Complaint.apimodel.request;
 
 
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ComplaintLogRequest {
+public class ComplaintCustomerLogRequest {
     private String customer_id;
     private String transactionId;
     private String transferType;

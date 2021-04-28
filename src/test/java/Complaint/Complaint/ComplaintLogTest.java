@@ -1,14 +1,14 @@
 package Complaint.Complaint;
 
-import Complaint.ApiRequestModel.ComplaintLogRequest;
-import Complaint.ApiRequestModel.ComplaintTransLogRequest;
-import Complaint.Controller.ComplaintController;
-import Complaint.Entity.CustomerComplaint;
-import Complaint.Entity.TransactionComplaint;
-import Complaint.Enum.ComplaintState;
-import Complaint.Repository.CustomerComplaintRepo;
-import Complaint.Service.ComplaintTransactionService;
-import Complaint.Service.CustomerComplaintService;
+import Complaint.apimodel.request.ComplaintCustomerLogRequest;
+import Complaint.apimodel.request.ComplaintTransactionLogRequest;
+import Complaint.controller.ComplaintController;
+import Complaint.entity.ComplaintCustomer;
+import Complaint.entity.ComplaintTransaction;
+import Complaint.enums.ComplaintState;
+import Complaint.repository.ComplaintCustomerRepository;
+import Complaint.service.ComplaintTransactionService;
+import Complaint.service.CustomerComplaintService;
 import org.json.simple.JSONObject;
 import org.junit.Before;
 import org.junit.jupiter.api.MethodOrderer;
@@ -31,23 +31,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-@ContextConfiguration(classes = {ComplaintController.class,ComplaintLogRequest.class, ComplaintTransLogRequest.class,ComplaintTransactionService.class})
+@ContextConfiguration(classes = {ComplaintController.class, ComplaintCustomerLogRequest.class, ComplaintTransactionLogRequest.class,ComplaintTransactionService.class})
 @WebMvcTest
 @AutoConfigureMockMvc
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class ComplaintLogTest {
     @MockBean
-    private ComplaintTransLogRequest complaintTransLogRequest;
+    private ComplaintTransactionLogRequest complaintTransactionLogRequest;
     @MockBean
     private CustomerComplaintService customerComplaintService;
     @MockBean
     private ComplaintTransactionService complaintTransactionService ;
     @MockBean
-    private CustomerComplaintRepo customerComplaintRepo;
+    private ComplaintCustomerRepository complaintCustomerRepository;
     /*@MockBean
-    public TransactionComplaint transactionComplaint;*/
+    public ComplaintTransaction transactionComplaint;*/
     @MockBean
-    private CustomerComplaint customerComplaint;
+    private ComplaintCustomer complaintCustomer;
 
     MockMvc mockmvc;
     private ComplaintState complaintState;
@@ -57,11 +57,11 @@ public class ComplaintLogTest {
     @Before
     public void initTransactionlog(){
         Date created_date = new Date(new java.util.Date().getTime());
-        CustomerComplaint customerComplaint = new CustomerComplaint(0L, "C00001","I made a mistake with sending my transaction to one Mr. Shark Frank" , created_date, "Jernice Lee", "Maria Anderson", ComplaintState.NEW.toString());
-        customerComplaintService.SaveCustomerComplaint(customerComplaint);
+        //ComplaintCustomer complaintCustomer = new ComplaintCustomer(0L, "C00001","I made a mistake with sending my transaction to one Mr. Shark Frank" , created_date, "Jernice Lee", "Maria Anderson", ComplaintState.NEW.toString());
+        customerComplaintService.SaveCustomerComplaint(complaintCustomer);
 
-        TransactionComplaint transactionComplaint = new TransactionComplaint(null,"C00001","T00001","inter");
-        complaintTransactionService.saveTransactionComplaint(transactionComplaint);
+        ComplaintTransaction complaintTransaction = new ComplaintTransaction();
+        complaintTransactionService.saveTransactionComplaint(complaintTransaction);
         //Get returned transaction from DB
         }
     @Test
@@ -81,7 +81,7 @@ public class ComplaintLogTest {
 
         try {
             MvcResult mvcr = mockmvc.perform(MockMvcRequestBuilders
-                    .post("/complaint/log")
+                    .post("/api/v1/customer-complaint/log")
                     .content(obj.toString())
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))
@@ -107,7 +107,7 @@ public class ComplaintLogTest {
     public void testComplaintTransLogRequest(JSONObject obj){
         try {
             MvcResult mvcr = mockmvc.perform(MockMvcRequestBuilders
-                    .post("/complaint/trans/recall/request")
+                    .post("/api/v1/customer-complaint/transaction/recall/request")
                     .content(obj.toJSONString())
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON))

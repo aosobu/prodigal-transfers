@@ -1,4 +1,4 @@
-package Complaint.Enum;
+package Complaint.enums;
 
 public enum TransferRecallType {
     INTRA,

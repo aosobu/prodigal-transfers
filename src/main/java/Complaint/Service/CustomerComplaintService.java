@@ -1,7 +1,8 @@
-package Complaint.Service;
+package Complaint.service;
 
-import Complaint.Entity.CustomerComplaint;
-import Complaint.Repository.CustomerComplaintRepo;
+import Complaint.entity.ComplaintCustomer;
+import Complaint.repository.ComplaintCustomerRepository;
+import com.teamapt.moneytor.lib.common.customer.model.CustomerAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,14 +12,18 @@ import javax.transaction.Transactional;
 @Transactional
 public class CustomerComplaintService {
     @Autowired
-    private CustomerComplaintRepo customerComplaintRepo;
+    private ComplaintCustomerRepository complaintCustomerRepository;
 
-    public void SaveCustomerComplaint(CustomerComplaint customerComplaint){
-        customerComplaintRepo.saveComplaint(customerComplaint.getCustomer_id(), customerComplaint.getComplaint_message(),
-                customerComplaint.getCreatedBy(), customerComplaint.getCreatedDate(),customerComplaint.getComplaintState(), customerComplaint.getUpdatedBy());
+    public void SaveCustomerComplaint(ComplaintCustomer complaintCustomer){
+        complaintCustomerRepository.saveComplaint(complaintCustomer.getCustomer_id(), complaintCustomer.getComplaint_message(),
+                complaintCustomer.getCreatedBy(), complaintCustomer.getCreatedDate(), complaintCustomer.getComplaintState(), complaintCustomer.getUpdatedBy());
     }
     public String getTransComplaintMessageAndTransferTypeByTid(String tid){
-        return  customerComplaintRepo.getTransComplaintMessageAndTransferTypeByTid(tid);
+        return  complaintCustomerRepository.getTransComplaintMessageAndTransferTypeByTid(tid);
+    }
+
+    public CustomerAccount findCustomerAccountByID(String customer_id){
+        return complaintCustomerRepository.findCustomerAccountByID(customer_id);
     }
 
 }
