@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface ComplaintRequestFilterProcessor {
 
-    List<Complaint> process(Complaint complaint);
+    List<Complaint> process(List<Complaint> complaint);
 }

@@ -4,10 +4,9 @@ import Complaint.model.Complaint;
 
 import java.util.List;
 
-public class TrackingNumberFilter implements ComplaintRequestFilterProcessor {
+public class SaveComplaintFilter implements ComplaintRequestFilterProcessor{
     @Override
     public List<Complaint> process(List<Complaint> complaint) {
-
-        return complaint;
+        return null;
     }
 }
