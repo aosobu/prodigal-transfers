@@ -2,9 +2,6 @@ package Complaint.Complaint;
 
 import Complaint.apimodel.request.ComplaintCustomerLogRequest;
 import Complaint.apimodel.request.ComplaintTransactionLogRequest;
-import Complaint.controller.ComplaintController;
-import Complaint.entity.ComplaintCustomer;
-import Complaint.entity.ComplaintTransaction;
 import Complaint.enums.ComplaintState;
 import Complaint.repository.ComplaintCustomerRepository;
 import Complaint.service.ComplaintTransactionService;

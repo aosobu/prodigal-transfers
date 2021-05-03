@@ -1,6 +1,5 @@
 package Complaint.service;
 
-import Complaint.entity.ComplaintCustomer;
 import Complaint.repository.ComplaintCustomerRepository;
 import com.teamapt.moneytor.lib.common.customer.model.CustomerAccount;
 import org.springframework.beans.factory.annotation.Autowired;

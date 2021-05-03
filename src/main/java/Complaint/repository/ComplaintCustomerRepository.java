@@ -1,6 +1,5 @@
 package Complaint.repository;
 
-import Complaint.entity.ComplaintCustomer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
