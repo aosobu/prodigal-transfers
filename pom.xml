@@ -31,28 +31,6 @@
 			<version>1.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>com.teamapt</groupId>
-			<artifactId>moneytor-lib</artifactId>
-			<version>2.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>moneytor-cloud-data-module</artifactId>
-					<groupId>com.teamapt</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>com.teamapt</groupId>
-			<artifactId>moneytor-frontoffice-lib</artifactId>
-			<version>2.0-SNAPSHOT</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>jersey-core</artifactId>
-					<groupId>com.sun.jersey</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-api</artifactId>
 			<version>8.0</version>
@@ -106,6 +84,11 @@
 			<artifactId>annotations</artifactId>
 			<version>RELEASE</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>exceptions-lib</artifactId>
+			<version>1.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.teamapt</groupId>
