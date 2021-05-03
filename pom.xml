@@ -25,11 +25,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.teamapt</groupId>
-			<artifactId>async-lib</artifactId>
-			<version>1.1-SNAPSHOT</version>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>com.teamapt</groupId>-->
+<!--			<artifactId>maker-checker-lib</artifactId>-->
+<!--			<version>1.0-SNAPSHOT</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.teamapt</groupId>-->
+<!--			<artifactId>async-lib</artifactId>-->
+<!--			<version>1.1-SNAPSHOT</version>-->
+<!--		</dependency>-->
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-api</artifactId>
@@ -85,17 +90,17 @@
 			<version>RELEASE</version>
 			<scope>compile</scope>
 		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>exceptions-lib</artifactId>
-			<version>1.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>com.teamapt</groupId>
-			<artifactId>base-prototypes</artifactId>
-			<version>1.0.1-SNAPSHOT</version>
-			<scope>compile</scope>
-		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>${project.groupId}</groupId>-->
+<!--			<artifactId>exceptions-lib</artifactId>-->
+<!--			<version>1.0-SNAPSHOT</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>com.teamapt</groupId>-->
+<!--			<artifactId>base-prototypes</artifactId>-->
+<!--			<version>1.0.1-SNAPSHOT</version>-->
+<!--			<scope>compile</scope>-->
+<!--		</dependency>-->
 	</dependencies>
 
 	<build>

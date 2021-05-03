@@ -1,13 +1,13 @@
 package Complaint.model;
 
+import Complaint.enums.ApprovalStatus;
+import Complaint.enums.TransferRecallType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Data
@@ -20,10 +20,42 @@ public class Complaint {
     private Long id;
 
     private String BeneficiaryBank;
+
     private String BeneficiaryAccountNumber;
-    private String Transferringank;
-    private String recallType;
+
+    private String TransferringBank;
+
+    private TransferRecallType recallType;
+
     private String complaintReason;
+
     private String CustomerInstruction;
 
+    private ApprovalStatus approvalStatus;
+
+    private String TrackingNumber;
+
+    private Date authorisationDate;
+
+    private String authoriserBranch;
+
+    private String authoriserName;
+
+    private String authoriserStaffId;
+
+    private String createdTime;
+
+    private String updatedTime;
+
+    @OneToOne
+    private ComplaintCustomer customer;
+
+    @OneToOne
+    private ComplaintTransaction transaction;
+
+    @OneToOne
+    private Actor actor;
+
+    @OneToOne
+    private ComplaintState complaintState;
 }

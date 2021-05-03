@@ -3,7 +3,7 @@ package Complaint.controller;
 import Complaint.Service.ComplaintLoggingService;
 import Complaint.model.Complaint;
 import Complaint.model.api.ComplaintLoggingRequest;
-import com.teamapt.exceptions.ApiException;
+//import com.teamapt.exceptions.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,13 +43,15 @@ public class LogComplaintController {
     @RequestMapping(value = "log-complaints", method = RequestMethod.POST)
     public List<Complaint> logComplaint(@RequestBody Complaint complaint,
                                         @RequestParam("staffId") String staffId,
-                                        Principal principal) throws ApiException {
+//                                        Principal principal) throws ApiException {
+                                        Principal principal) throws Exception {
         try {
             ComplaintLoggingRequest complaintLoggingRequest = ComplaintLoggingRequest.with(complaint);
             complaintLoggingRequest.setInitiator(complaintLoggingRequest.getInitiatorOrDefault(principal.getName()));
             return complaintLoggingService.logComplaint(complaintLoggingRequest);
         } catch (Exception e) {
-            throw new ApiException(e);
+//            throw new ApiException(e);
+            throw new Exception(e);
         }
     }
 
