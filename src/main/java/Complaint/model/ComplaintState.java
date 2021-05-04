@@ -38,7 +38,7 @@ public class ComplaintState {
 
     private Boolean isCustomerAcknowledgmentReceived;
 
-    private Boolean isMailSentTOCustomer;
+    private Boolean isMailSentToCustomer;
 
     private Boolean isMailSentToBankStaff;
 
