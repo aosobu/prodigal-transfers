@@ -1,11 +1,8 @@
 package Complaint.Service;
 
-import Complaint.Service.complaintrequestprocessor.ComplaintRequestFilterProcessor;
 import Complaint.model.Complaint;
 import Complaint.model.api.ComplaintLoggingRequest;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,15 +12,15 @@ public class ComplaintLoggingService {
 
     public List<Complaint> logComplaint(ComplaintLoggingRequest complaintLoggingRequest){
 
-        // check for duplicate complaint
+        // check for duplicate complaint done
 
-        // generate tracking number: use a unique algorithm to generates a sequence
+        // generate tracking number: use a unique algorithm to generates a sequence done
 
-        // update appropriate complaint states including approval statuses
+        // update appropriate complaint states including approval statuses approval done, others pending
 
-        // save complaint
+        // save complaint done
 
-        // save complaint instruction
+        // save complaint instruction. Confusing
 
         return new ArrayList<>();
     }
