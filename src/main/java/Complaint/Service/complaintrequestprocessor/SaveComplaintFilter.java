@@ -10,13 +10,15 @@ public class SaveComplaintFilter implements ComplaintRequestFilterProcessor{
     ComplaintRepository complaintRepository;
 
     @Override
-    public Complaint processTwo(Complaint complaint) throws Exception {
+    public List<Complaint> process(List<Complaint> complaint) throws Exception {
 
-        try {
-            complaintRepository.save(complaint);
-        }
-        catch (Exception e) {
-            throw new Exception("Could not save the complaint");
+        for (Complaint aComplaint : complaint) {
+            try {
+                complaintRepository.save(aComplaint);
+            }
+            catch (Exception e) {
+                throw new Exception("Could not save the complaint");
+            }
         }
 
         return complaint;

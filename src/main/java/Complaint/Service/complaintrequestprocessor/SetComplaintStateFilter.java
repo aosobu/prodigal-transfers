@@ -2,12 +2,12 @@ package Complaint.Service.complaintrequestprocessor;
 
 import Complaint.model.Complaint;
 
+import java.util.List;
+
 public class SetComplaintStateFilter implements ComplaintRequestFilterProcessor{
 
     @Override
-    public Complaint processTwo(Complaint complaint) {
-
-
+    public List<Complaint> process(List<Complaint> complaint) throws Exception {
         return null;
     }
 }

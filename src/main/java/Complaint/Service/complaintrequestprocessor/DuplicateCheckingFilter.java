@@ -8,17 +8,18 @@ import java.util.Set;
 
 public class DuplicateCheckingFilter implements ComplaintRequestFilterProcessor {
 
+    boolean isDuplicateComplaintObjectPresent;
+
     @Override
-    public List<Complaint> process(List<Complaint> complaint, Complaint aComplaint) throws Exception {
+    public List<Complaint> process(List<Complaint> complaint) throws Exception {
 
-        Set<String> hashSet = new HashSet<>();
-
-        for (Complaint complaint1 : complaint) {
-            hashSet.add(complaint1.getTransaction().getRrn());
+        try {
+            Set<Complaint> complaintSet = new HashSet<>(complaint);
+            isDuplicateComplaintObjectPresent = complaint.size() != complaintSet.size();
         }
-
-        if (hashSet.contains(aComplaint.getTransaction().getRrn()))
-            throw new Exception("This complaint has already been created");
+        catch (Exception e) {
+            throw new Exception("Action cannot be completed");
+        }
         return complaint;
     }
 }

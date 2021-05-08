@@ -8,15 +8,17 @@ import java.util.List;
 public class UpdateApprovalStatusFilter implements ComplaintRequestFilterProcessor{
 
     @Override
-    public Complaint processTwo(Complaint complaint) throws Exception {
+    public List<Complaint> process(List<Complaint> complaint) throws Exception {
 
-        try {
-            if (complaint.getApprovalStatus() == null || complaint.getApprovalStatus().equals(ApprovalStatus.DECLINED)) {
-                complaint.setApprovalStatus(ApprovalStatus.APPROVED);
+        for (Complaint aComplaint : complaint) {
+            try {
+                if (aComplaint.getApprovalStatus() == null || aComplaint.getApprovalStatus().equals(ApprovalStatus.DECLINED)) {
+                    aComplaint.setApprovalStatus(ApprovalStatus.APPROVED);
+                }
             }
-        }
-        catch (Exception e) {
-            throw new Exception("Approval status cannot be set");
+            catch (Exception e) {
+                throw new Exception("Approval status cannot be set");
+            }
         }
 
         return complaint;
