@@ -11,7 +11,7 @@ import java.util.List;
 @Transactional
 public class ComplaintServiceImpl implements ComplaintService{
 
-    @Autowired
+//    @Autowired
     private ComplaintRepository complaintRepository;
 
     @Override

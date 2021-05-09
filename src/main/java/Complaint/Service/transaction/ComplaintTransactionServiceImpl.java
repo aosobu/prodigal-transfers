@@ -12,7 +12,7 @@ import java.util.List;
 @Transactional
 public class ComplaintTransactionServiceImpl implements ComplaintTransactionService{
 
-    @Autowired
+//    @Autowired
     private ComplaintTransactionRepository complaintTransactionRepository;
 
     @Override

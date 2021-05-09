@@ -12,7 +12,7 @@ import java.util.List;
 @Transactional
 public class ActorServiceImpl implements ActorService {
 
-    @Autowired
+
     private ActorRepository actorRepository;
 
     @Override
