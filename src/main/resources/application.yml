@@ -1,0 +1,82 @@
+#server configuration
+server:
+  port : 9008
+  servlet:
+    encoding:
+      force-response: true
+
+#datasource configurations`
+datasource:
+  primary:
+    jdbc-url: jdbc:sqlserver://localhost:1433;databaseName=transfer_recall
+    username: sa
+    password: Sam2019$
+    testOnBorrow: true
+    validation-query: SELECT 1
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    hibernate.dialect: org.hibernate.dialect.SQLServer2012Dialect
+
+  infopool:
+      jdbc-url: jdbc:jtds:sqlserver:/10.10.7.83/Ebanking
+      username: ebanking_connect_user
+      password: Password@123
+      testOnBorrow: true
+      validation-query: SELECT 1
+      driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      hibernate.dialect: org.hibernate.dialect.SQLServer2012Dialect
+
+  fincale:
+    jdbc-url: jdbc:oracle:thin:@10.10.7.121:1521:FB12TEST
+    username: PROFECTUS_FIN
+    password: Fidelity_123
+    testOnBorrow: true
+    validation-query: SELECT 1
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+#logging properties
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: DEBUG
+
+    root: INFO
+
+    type:
+      descriptor:
+        sql:
+        BasicBinder: TRACE
+
+#default spring datasource configurations
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    properties:
+      hibernate:
+        format_sql: true
+
+      databse-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+
+      data:
+        jpa:
+          repositories:
+            bootstrap-mode: deferred
+hibernate:
+  dialect:
+
+#cba configurations
+finacle:
+  htd:
+    table: tbaadm.htd
+  dtd:
+    table: tbaadm.dtd
+  gam:
+    table: tbaadm.gam
+  upr:
+    table: tbaadm.upr
+  get:
+    table: tbaadm.get
+  gsp:
+    table: tbaadm.gsp

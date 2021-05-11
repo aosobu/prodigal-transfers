@@ -59,16 +59,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.teamapt</groupId>-->
-<!--			<artifactId>maker-checker-lib</artifactId>-->
-<!--			<version>1.0-SNAPSHOT</version>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>com.teamapt</groupId>-->
-<!--			<artifactId>async-lib</artifactId>-->
-<!--			<version>1.1-SNAPSHOT</version>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-api</artifactId>
@@ -100,18 +90,6 @@
 			<artifactId>junit-jupiter-engine</artifactId>
 			<scope>test</scope>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.googlecode.json-simple</groupId>-->
-<!--			<artifactId>json-simple</artifactId>-->
-<!--			<version>1.1.1</version>-->
-<!--			<scope>test</scope>-->
-<!--		</dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.googlecode.json-simple</groupId>-->
-<!--            <artifactId>json-simple</artifactId>-->
-<!--            <version>1.1.1</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
 		<dependency>
 			<groupId>com.googlecode.json-simple</groupId>
 			<artifactId>json-simple</artifactId>
@@ -124,17 +102,38 @@
 			<version>RELEASE</version>
 			<scope>compile</scope>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>${project.groupId}</groupId>-->
-<!--			<artifactId>exceptions-lib</artifactId>-->
-<!--			<version>1.0-SNAPSHOT</version>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>6.4.0.jre8</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-lang3</artifactId>
+					<groupId>org.apache.commons</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>com.teamapt</groupId>
+			<artifactId>exceptions-lib</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
+		<!--<dependency>-->
 <!--			<groupId>com.teamapt</groupId>-->
 <!--			<artifactId>base-prototypes</artifactId>-->
 <!--			<version>1.0.1-SNAPSHOT</version>-->
 <!--			<scope>compile</scope>-->
 <!--		</dependency>-->
+		<!--		<dependency>-->
+		<!--			<groupId>com.teamapt</groupId>-->
+		<!--			<artifactId>maker-checker-lib</artifactId>-->
+		<!--			<version>1.0-SNAPSHOT</version>-->
+		<!--		</dependency>-->
+		<!--		<dependency>-->
+		<!--			<groupId>com.teamapt</groupId>-->
+		<!--			<artifactId>async-lib</artifactId>-->
+		<!--			<version>1.1-SNAPSHOT</version>-->
+		<!--		</dependency>-->
 	</dependencies>
 
 	<build>

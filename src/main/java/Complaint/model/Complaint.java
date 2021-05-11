@@ -18,44 +18,34 @@ public class Complaint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String BeneficiaryBank;
-
     private String BeneficiaryAccountNumber;
-
     private String TransferringBank;
-
     private TransferRecallType recallType;
-
     private String complaintReason;
-
     private String CustomerInstruction;
-
     private ApprovalStatus approvalStatus;
-
     private String TrackingNumber;
-
     private Date authorisationDate;
-
     private String authoriserBranch;
-
     private String authoriserName;
-
     private String authoriserStaffId;
-
     private String createdTime;
-
     private String updatedTime;
 
-    @OneToOne
-    private ComplaintCustomer customer;
+    @OneToOne(fetch = FetchType.EAGER,
+              cascade = CascadeType.ALL)
+    private ComplaintCustomer complaintCustomer;
 
-    @OneToOne
-    private ComplaintTransaction transaction;
+    @OneToOne(fetch = FetchType.EAGER,
+              cascade = CascadeType.ALL)
+    private ComplaintTransaction complaintTransaction;
 
-    @OneToOne
-    private Actor actor;
+    @OneToOne(fetch = FetchType.LAZY,
+              cascade = CascadeType.ALL)
+    private BranchUser branchUser;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER,
+              cascade = CascadeType.ALL)
     private ComplaintState complaintState;
 }

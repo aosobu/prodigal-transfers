@@ -1,6 +1,6 @@
 package Complaint.model.api;
 
-import Complaint.model.Actor;
+import Complaint.model.BranchUser;
 import Complaint.model.Complaint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,23 +19,17 @@ import java.util.List;
 @NoArgsConstructor
 public class ComplaintLoggingRequest {
 
-    private String initiator = "";
     private List<Complaint> complaints = new ArrayList<>();
     private List<MultipartFile> files = new ArrayList<>();
-    //private BankService bankService;
+    private BranchUser branchUser;
+    private String initiator;
 
-    public String getInitiatorOrDefault(String defaultValue) {
-        return Strings.isNullOrEmpty(initiator) ? defaultValue : initiator;
-    }
-
-    private Actor getActorDetials(){
-        //get staff details using branch service;
-        return null;
-    }
-
-    public static ComplaintLoggingRequest with(Complaint complaint) {
+    public static ComplaintLoggingRequest with(Complaint complaint, BranchUser branchUser, String defaultValue) {
+        String initiator = "";
         ComplaintLoggingRequest request= new ComplaintLoggingRequest();
         request.setComplaints(Collections.singletonList(complaint));
+        request.setBranchUser(branchUser);
+        request.setInitiator(Strings.isNullOrEmpty(initiator) ? defaultValue : initiator);
         return request;
     }
 }
