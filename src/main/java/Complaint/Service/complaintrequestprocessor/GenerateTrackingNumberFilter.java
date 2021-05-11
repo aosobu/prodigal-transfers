@@ -5,7 +5,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.List;
 
-public class TrackingNumberFilter implements ComplaintRequestFilterProcessor {
+public class GenerateTrackingNumberFilter implements ComplaintRequestFilterProcessor {
 
     @Override
     public List<Complaint> process(List<Complaint> complaint) throws Exception {
