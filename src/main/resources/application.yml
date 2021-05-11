@@ -25,7 +25,7 @@ datasource:
       driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
       hibernate.dialect: org.hibernate.dialect.SQLServer2012Dialect
 
-  fincale:
+  finacle:
     jdbc-url: jdbc:oracle:thin:@10.10.7.121:1521:FB12TEST
     username: PROFECTUS_FIN
     password: Fidelity_123
