@@ -47,6 +47,28 @@ logging:
         sql:
         BasicBinder: TRACE
 
+#cba configurations
+finacle:
+  htd:
+    table: tbaadm.htd
+  dtd:
+    table: tbaadm.dtd
+  gam:
+    table: tbaadm.gam
+  upr:
+    table: tbaadm.upr
+  get:
+    table: tbaadm.get
+  gsp:
+    table: tbaadm.gsp
+
+#flyway configuration
+flyway:
+  jdbc-url: jdbc:sqlserver://localhost:1433;databaseName=transfer_recall
+  username: sa
+  password: Sam2019$
+  locations: /Users/aosobu/Documents/ProjectTeamApt/fidelity/transfer-recall/src/main/resources/db/migration
+
 #default spring datasource configurations
 spring:
   jpa:
@@ -63,20 +85,8 @@ spring:
         jpa:
           repositories:
             bootstrap-mode: deferred
+  flyway:
+      enabled: true
+
 hibernate:
   dialect:
-
-#cba configurations
-finacle:
-  htd:
-    table: tbaadm.htd
-  dtd:
-    table: tbaadm.dtd
-  gam:
-    table: tbaadm.gam
-  upr:
-    table: tbaadm.upr
-  get:
-    table: tbaadm.get
-  gsp:
-    table: tbaadm.gsp

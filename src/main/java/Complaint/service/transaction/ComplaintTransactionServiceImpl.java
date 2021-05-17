@@ -2,6 +2,7 @@ package Complaint.service.transaction;
 
 import Complaint.model.ComplaintTransaction;
 import Complaint.repository.ComplaintTransactionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -11,7 +12,7 @@ import java.util.List;
 @Transactional
 public class ComplaintTransactionServiceImpl implements ComplaintTransactionService{
 
-//    @Autowired
+    @Autowired
     private ComplaintTransactionRepository complaintTransactionRepository;
 
     @Override
