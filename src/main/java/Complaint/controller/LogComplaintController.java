@@ -1,15 +1,15 @@
 package Complaint.controller;
 
-import Complaint.model.BranchUser;
-import Complaint.model.Complaint;
+import Complaint.model.*;
+import Complaint.model.api.AccountDateRange;
 import Complaint.model.api.ComplaintLoggingRequest;
-import Complaint.service.BankService;
-import Complaint.service.ComplaintLoggingService;
+import Complaint.service.*;
 import com.teamapt.exceptions.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 
@@ -17,17 +17,61 @@ import java.util.List;
 @RequestMapping("/api/v1/")
 public class LogComplaintController {
 
-    private BankService bankService;
     private ComplaintLoggingService complaintLoggingService;
+    private TransactionService transactionService;
+    private CustomerService customerService;
+    private BankServiceImpl bankServiceImpl;
 
-    //PreAuthorize("hasAuthority('as_tr_log_complaint')")
-    @RequestMapping(value = "log-complaints", method = RequestMethod.POST)
-    public List<Complaint> logComplaint(@RequestBody Complaint complaint,
-                                        @RequestParam("filesListArr[]") MultipartFile[] files,
-                                        Principal principal) throws ApiException {
+    @RequestMapping(value = "complaint-transactions", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    List<Transaction> getComplaintTransactions(@RequestBody @Valid AccountDateRange accountDateRange) throws ApiException {
         try {
-            BranchUser branchUser = bankService.getUserDetails(principal.getName());
-            ComplaintLoggingRequest complaintLoggingRequest = ComplaintLoggingRequest.with(complaint, branchUser, principal.getName());
+            return transactionService.getComplaintTransactions(accountDateRange);
+        } catch (Exception e) {
+            throw new ApiException(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "check-for-logged", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    List<Transaction> checkIfAlreadyLogged(@RequestBody @Valid List<Transaction> transactions) throws ApiException {
+        try {
+            return complaintLoggingService.findAlreadyLoggedTxns(transactions);
+        } catch (Exception e) {
+            throw new ApiException(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "customer-details/{accNo}", method = RequestMethod.GET)
+    public
+    @ResponseBody
+    Customer getCustomerComplaints(@PathVariable String accNo) throws ApiException {
+        try {
+            return customerService.getCustomerDetails(accNo);
+        } catch (Exception e) {
+            throw new ApiException(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "banks", method = RequestMethod.GET)
+    public @ResponseBody List<Bank> getBankList() throws ApiException{
+        try{
+            return bankServiceImpl.getAllBanks();
+        }catch(Exception e){
+            throw new ApiException(e.getMessage());
+        }
+    }
+
+    //@PreAuthorize("hasAuthority('as_cs_log_complaint')")
+    @RequestMapping(value = "log-complaints", method = RequestMethod.POST)
+    public List<Complaint> logComplaint(@RequestParam("complaint") String complaint,
+                                        @RequestParam("customerInstruction") MultipartFile file,
+                                        @RequestParam("customerInstructionName") String fileName
+                                        ) throws ApiException {
+        try {
+            ComplaintLoggingRequest complaintLoggingRequest = ComplaintLoggingRequest.with(complaint, file, fileName, "");
             return complaintLoggingService.logComplaint(complaintLoggingRequest);
         } catch (Exception e) {
             throw new ApiException(e);
@@ -35,12 +79,22 @@ public class LogComplaintController {
     }
 
     @Autowired
-    public void setBankService(BankService bankService) {
-        this.bankService = bankService;
+    public void setComplaintLoggingService(ComplaintLoggingService complaintLoggingService) {
+        this.complaintLoggingService = complaintLoggingService;
     }
 
     @Autowired
-    public void setComplaintLoggingService(ComplaintLoggingService complaintLoggingService) {
-        this.complaintLoggingService = complaintLoggingService;
+    public void setTransactionService(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
+
+    @Autowired
+    public void setCustomerService(CustomerService customerService) {
+        this.customerService = customerService;
+    }
+
+    @Autowired
+    public void setBankServiceImpl(BankServiceImpl bankServiceImpl) {
+        this.bankServiceImpl = bankServiceImpl;
     }
 }

@@ -1,0 +1,258 @@
+{
+    "domain": "CUSTOMER-SUPPORT-SERVICE",
+    "applicationRoles": [
+        {
+            "role": {
+                "name": "AS_CUSTOMER_SUPPORT_ADMIN",
+                "friendlyName": "Customer Support Admin"
+            }
+        },
+        {
+            "role": {
+                "name": "AS_CUSTOMER_SUPPORT_ASSIGNER",
+                "friendlyName": "Customer Support Assigner"
+            }
+        },
+        {
+            "role": {
+                "name": "AS_CUSTOMER_SUPPORT_ASSIGNEE",
+                "friendlyName": "Customer Support Assignee"
+            }
+        },
+        {
+            "role": {
+                "name": "AS_CUSTOMER_SUPPORT_RECONCILIATION_DESK_ASSIGNER",
+                "friendlyName": "Customer Support Reconciliation Desk Assigner"
+            }
+        },
+        {
+            "role": {
+                "name": "AS_CUSTOMER_SUPPORT_RECONCILIATION_DESK_ASSIGNEE",
+                "friendlyName": "Customer Support Reconciliation Desk Assignee"
+            }
+        },
+        {
+            "role": {
+                "name": "AS_CUSTOMER_SUPPORT_FRAUD_DESK_ASSIGNER",
+                "friendlyName": "Customer Support Fraud Desk Assigner"
+            }
+        },
+        {
+            "role": {
+                "name": "AS_CUSTOMER_SUPPORT_FRAUD_DESK_ASSIGNEE",
+                "friendlyName": "Customer Support Fraud Desk Assignee"
+            }
+        },
+        {
+            "role": {
+                "name": "AS_CUSTOMER_SUPPORT_CSO",
+                "friendlyName": "Customer Support CSO"
+            }
+        },
+        {
+            "role": {
+                "name": "AS_CUSTOMER_SUPPORT_TRUE_SERVE",
+                "friendlyName": "Customer Support True Serve"
+            }
+        },
+        {
+            "role": {
+                "name": "AS_CUSTOMER_SUPPORT_VIRTUAL_BRANCH_ASSIGNER",
+                "friendlyName": "Customer Support Virtual Branch Assigner"
+            }
+        },
+        {
+            "role": {
+                "name": "AS_CUSTOMER_SUPPORT_VIRTUAL_BRANCH_ASSIGNEE",
+                "friendlyName": "Customer Support Virtual Branch Assignee"
+            }
+        },
+        {
+            "role": {
+                "name": "AS_CUSTOMER_SUPPORT_VIEW_ONLY",
+                "friendlyName": "Customer Support View Only"
+            }
+        }
+    ],
+    "applicationAuthorities": [
+        {
+            "authority": {
+                "authority": "as_cs_log_complaint",
+                "friendlyName": "Log Complaint",
+                "description": "Log a new complaint"
+            }
+        },
+        {
+            "authority": {
+                "authority": "as_cs_assign_complaint",
+                "friendlyName": "Assign Complaint",
+                "description": "Assign a complaint to a staff"
+            }
+        },
+        {
+            "authority": {
+                "authority": "as_cs_resolve_complaint",
+                "friendlyName": "Resolve Complaint",
+                "description": "Resolve complaint"
+            }
+        },
+        {
+            "authority": {
+                "authority": "as_cs_reconciliation_desk",
+                "friendlyName": "Reconciliation Desk",
+                "description": "Reconciliation desk"
+            }
+        },
+        {
+            "authority": {
+                "authority": "as_cs_fraud_desk",
+                "friendlyName": "Fraud Desk",
+                "description": "Fraud desk"
+            }
+        },
+        {
+            "authority": {
+                "authority": "as_cs_true_serve",
+                "friendlyName": "True Serve",
+                "description": "True Serve"
+            }
+        },
+        {
+            "authority": {
+                "authority": "as_cs_virtual_branch",
+                "friendlyName": "Virtual Branch",
+                "description": "Virtual Branch"
+            }
+        },
+        {
+            "authority": {
+                "authority": "as_cs_view_settings",
+                "friendlyName": "View Settings",
+                "description": "View Settings"
+            }
+        },
+        {
+            "authority": {
+                "authority": "as_cs_update_settings",
+                "friendlyName": "Update Settings",
+                "description": "Update Settings"
+            }
+        },
+        {
+            "authority": {
+                "authority": "as_cs_view_all",
+                "friendlyName": "View All Only",
+                "description": "View all only"
+            }
+        },
+        {
+            "authority": {
+                "authority": "as_cs_view_module",
+                "friendlyName": "View Customer Support Module",
+                "description": "View customer support module"
+            }
+        }
+    ],
+    "applicationRoleAuthorities": [
+        {
+            "role": "AS_CUSTOMER_SUPPORT_ADMIN",
+            "authorities": [
+                "as_cs_view_module",
+                "as_cs_log_complaint",
+                "as_cs_assign_complaint",
+                "as_cs_resolve_complaint",
+                "as_cs_view_settings",
+                "as_cs_update_settings",
+                "as_cs_view_all"
+            ]
+        },
+        {
+            "role": "AS_CUSTOMER_SUPPORT_ASSIGNER",
+            "authorities": [
+                "as_cs_view_module",
+                "as_cs_assign_complaint",
+                "as_cs_resolve_complaint"
+            ]
+        },
+        {
+            "role": "AS_CUSTOMER_SUPPORT_ASSIGNEE",
+            "authorities": [
+                "as_cs_view_module",
+                "as_cs_resolve_complaint"
+            ]
+        },
+        {
+            "role": "AS_CUSTOMER_SUPPORT_RECONCILIATION_DESK_ASSIGNER",
+            "authorities": [
+                "as_cs_view_module",
+                "as_cs_reconciliation_desk",
+                "as_cs_assign_complaint",
+                "as_cs_resolve_complaint"
+            ]
+        },
+        {
+            "role": "AS_CUSTOMER_SUPPORT_RECONCILIATION_DESK_ASSIGNEE",
+            "authorities": [
+                "as_cs_view_module",
+                "as_cs_reconciliation_desk",
+                "as_cs_resolve_complaint"
+            ]
+        },
+        {
+            "role": "AS_CUSTOMER_SUPPORT_FRAUD_DESK_ASSIGNER",
+            "authorities": [
+                "as_cs_view_module",
+                "as_cs_fraud_desk",
+                "as_cs_assign_complaint",
+                "as_cs_resolve_complaint"
+            ]
+        },
+        {
+            "role": "AS_CUSTOMER_SUPPORT_FRAUD_DESK_ASSIGNEE",
+            "authorities": [
+                "as_cs_view_module",
+                "as_cs_fraud_desk",
+                "as_cs_resolve_complaint"
+            ]
+        },
+        {
+            "role": "AS_CUSTOMER_SUPPORT_CSO",
+            "authorities": [
+                "as_cs_view_module",
+                "as_cs_log_complaint"
+            ]
+        },
+        {
+            "role": "AS_CUSTOMER_SUPPORT_TRUE_SERVE",
+            "authorities": [
+                "as_cs_view_module",
+                "as_cs_log_complaint",
+                "as_cs_true_serve"
+            ]
+        },
+        {
+            "role": "AS_CUSTOMER_SUPPORT_VIRTUAL_BRANCH_ASSIGNER",
+            "authorities": [
+                "as_cs_view_module",
+                "as_cs_virtual_branch",
+                "as_cs_assign_complaint",
+                "as_cs_resolve_complaint"
+            ]
+        },
+        {
+            "role": "AS_CUSTOMER_SUPPORT_VIRTUAL_BRANCH_ASSIGNEE",
+            "authorities": [
+                "as_cs_view_module",
+                "as_cs_virtual_branch",
+                "as_cs_resolve_complaint"
+            ]
+        },
+        {
+            "role": "AS_CUSTOMER_SUPPORT_VIEW_ONLY",
+            "authorities": [
+                "as_cs_view_module",
+                "as_cs_view_all"
+            ]
+        }
+    ]
+}

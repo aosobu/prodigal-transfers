@@ -23,10 +23,6 @@ public class ComplaintCustomer {
     private String customerPhoneNumber;
     private String customerAccountName;
     private String customerAccountNumber;
-    private String customerFirstName;
-    private String customerMiddleName;
-    private String customerLastName;
-    private String customerConsultantName;
     private String customerAccountBranch;
     private String customerClientType;
     private String customerAccountType;

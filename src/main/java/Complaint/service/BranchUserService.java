@@ -8,11 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-/**
- * Created by Osobu Adewale 2021-05-10
- */
 @Service
-public class BankService {
+public class BranchUserService {
 
     Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -20,10 +17,9 @@ public class BankService {
 
     public BranchUser getUserDetails(String staffId) throws CosmosServiceException {
         try {
-            logger.debug("Start fetching user deatils from finalce");
+            logger.debug("Fetching user detils from finalce");
             BranchUser branchUser = finacleDao.getBankUserByStaffId(staffId);
             if(branchUser == null) {
-                //decide what to do: send mail to notify admin or something
                 throw new CosmosServiceException("Problem Getting User Information.");
             }
             logger.debug("Stop fetching user deatils");

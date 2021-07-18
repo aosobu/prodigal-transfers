@@ -17,7 +17,7 @@ datasource:
     hibernate.dialect: org.hibernate.dialect.SQLServer2012Dialect
 
   infopool:
-      jdbc-url: jdbc:jtds:sqlserver:/10.10.7.83/Ebanking
+      jdbc-url: jdbc:sqlserver://10.10.7.83:1433;databaseName=Ebanking
       username: ebanking_connect_user
       password: Password@123
       testOnBorrow: true
@@ -26,12 +26,12 @@ datasource:
       hibernate.dialect: org.hibernate.dialect.SQLServer2012Dialect
 
   finacle:
-    jdbc-url: jdbc:oracle:thin:@10.10.7.121:1521:FB12TEST
-    username: PROFECTUS_FIN
-    password: Fidelity_123
+    jdbc-url: jdbc:oracle:thin:@10.120.9.21:1521:FBDB_STDBY2
+    username: profectus_fin
+    password: Fidelity_12
     testOnBorrow: true
-    validation-query: SELECT 1
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    validation-query: SELECT 1 from dual
+    driver-class-name: oracle.jdbc.OracleDriver
 
 #logging properties
 logging:
@@ -39,6 +39,10 @@ logging:
     org:
       hibernate:
         SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
 
     root: INFO
 
@@ -46,6 +50,11 @@ logging:
       descriptor:
         sql:
         BasicBinder: TRACE
+
+  file:
+    name: /Users/aosobu/Documents/ProjectTeamApt/fidelity/transfer-recall/logs/transfer-recall
+
+
 
 #cba configurations
 finacle:
@@ -90,3 +99,18 @@ spring:
 
 hibernate:
   dialect:
+
+tracking:
+  number:
+    length: 10
+
+oauth:
+  resource:
+    id: autum-settlement-service
+
+  verifier:
+    key: -----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAskW18478JOqsJretRDk8I2R97e34qgwUt9DM3AAZdaskiL2ygZfCTumYY90tjvvU3ypZcNvvtrJ54g+utCTdfzIPmFIQzMD83zbONd4YctI+7a0yqzQ8GZUKgvdcsj2DQ0GqtsKm6yJ21VLJr9PIaGRjp67/9Wi6PCg0IJLBH0NNsO4NhdtPK804zgB0VZlJuWRBM1Iu0NC6OKmmKogYDnQfzvdFXGWpcF/1Thf/9cTIW+BTOG0Kf5DQrs/MMv1CWSTiFvmFchMl7OrkFMQqqMx0FsAz3ZF49+N3HYAISUPbdjWScYOBPUZzj+p19Sw2fSEHQlLFM/Au3/GC3tzeXQIDAQAB\n-----END PUBLIC KEY-----
+
+
+
+

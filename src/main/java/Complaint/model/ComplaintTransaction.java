@@ -15,39 +15,9 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ComplaintTransaction {
+public class ComplaintTransaction extends BaseTransaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String pan;
-
-    private String tranId;
-
-    private String sessionId;
-
-    private String narration;
-
-    private String rrn;
-
-    private String stan;
-
-    private String terminalId;
-
-    private String schemeCode;
-
-    private boolean alat;
-
-    private String currencyCode;
-
-    private String sol;
-
-    private boolean international;
-
-    private BigDecimal amount;
-
-    private Date transactionDate;
-
-    private Date valueDate;
 }

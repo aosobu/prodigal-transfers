@@ -2,25 +2,38 @@ package Complaint.service.complaintrequestprocessor;
 
 import Complaint.model.Complaint;
 import Complaint.repository.ComplaintRepository;
+import Complaint.service.ComplaintServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class SaveComplaintFilter implements ComplaintRequestFilterProcessor{
+@Service
+public class SaveComplaintFilter{
 
-    ComplaintRepository complaintRepository;
+    ComplaintServiceImpl complaintServiceImpl;
 
-    @Override
     public List<Complaint> process(List<Complaint> complaint) throws Exception {
+        List<Complaint> complaintList = new ArrayList<>();
+        Complaint savedComplaint = new Complaint();
 
         for (Complaint aComplaint : complaint) {
             try {
-                complaintRepository.save(aComplaint);
+                savedComplaint = complaintServiceImpl.saveComplaint(aComplaint);
+                if(savedComplaint.getId() > 0){
+                    complaintList.add(savedComplaint);
+                }
             }
             catch (Exception e) {
-                throw new Exception("Could not save the complaint");
+                throw new Exception("Error saving complaint {} ");
             }
         }
+        return complaintList;
+    }
 
-        return complaint;
+    @Autowired
+    public void setComplaintServiceImpl(ComplaintServiceImpl complaintServiceImpl) {
+        this.complaintServiceImpl = complaintServiceImpl;
     }
 }

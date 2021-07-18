@@ -19,17 +19,20 @@ public class ComplaintState {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String Status;
+    private int processingState;
+    private Date timeEmailToBeneficiaryBankSent;
+    private Date timeEmailReceivedFromBeneficiaryBankSent;
+    private String messageSentToBeneficiaryBank;
+    private String messageReceivedFromBeneficiaryBank;
+    private Date timeEmailToCustomerSent;
+    private Date timeAcknowledgementFromCustomerReceived;
     private Date resolvedTime;
     private Date timeLienPlace;
-    private Date timeEmailToBeneficiarySent;
-    private Date timeEmailReceivedFromBeneficiaryBankSent;
-    private Date timeReceivedFromCustomer;
-    private Boolean isMailSentToBeneficiaryBank;
     private Boolean isLienPlaced;
-    private Boolean isCustomerAcknowledgmentReceived;
-    private Boolean isMailSentToCustomer;
-    private Boolean isMailSentToBankStaff;
+    private Boolean isMailSentToBeneficiaryBank;
     private Boolean isBeneficiaryBankAcknowledgmentReceived;
+    private Boolean isMailSentToCustomer;
+    private Boolean isCustomerAcknowledgmentReceived;
+    private Boolean isMailSentToBankStaff;
     private Boolean isComplaintResolved;
 }
