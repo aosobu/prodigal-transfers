@@ -1,17 +1,11 @@
 package Complaint.model;
 
-import lombok.Getter;
-import lombok.Setter;
 
-import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import java.math.BigDecimal;
 import java.util.Date;
 
-@Getter
-@Setter
-@MappedSuperclass
 public abstract class BaseTransaction {
     private String accountNumber;
     private String accountName;

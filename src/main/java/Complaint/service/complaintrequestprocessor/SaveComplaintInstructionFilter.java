@@ -3,6 +3,7 @@ package Complaint.service.complaintrequestprocessor;
 import Complaint.model.Complaint;
 import Complaint.model.ComplaintInstruction;
 import Complaint.repository.CustomerInstructionRepository;
+import Complaint.utilities.DatesUtils;
 import com.teamapt.exceptions.CosmosServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,18 +36,18 @@ public class SaveComplaintInstructionFilter implements ComplaintRequestFilterPro
 
     @Override
     public Complaint process(Complaint complaint, List<Map<String, MultipartFile>> instruction) throws Exception {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh-mm");
         Map<String, MultipartFile> instructionFileMap = instruction.get(0);
 
         try {
-            byte[] bytes = instructionFileMap.get(0).getBytes();
+            String fileName = getKeyFromInstructionMap(instructionFileMap);
+            byte[] bytes = instructionFileMap.get(fileName).getBytes();
             if (bytes.length == 0)
                 return complaint;
 
             String filePath = complaintFilesPath + "/"
                             + complaint.getComplaintCustomer().getCustomerAccountName().replace(" ", "") + "_"
                             + complaint.getId() + "_"
-                            + sdf.format(complaint.getCreatedTime())
+                            + DatesUtils.getInstantDateTimeInDifferentFormat()
                             + ".pdf";
 
             File newFile = new File(filePath);
@@ -61,15 +62,25 @@ public class SaveComplaintInstructionFilter implements ComplaintRequestFilterPro
             outputStream.flush();
             outputStream.close();
 
-            complaint.getComplaintInstruction().setName("");
-            complaint.getComplaintInstruction().setFilePath(filePath);
+            ComplaintInstruction complaintInstruction = complaint.getComplaintInstruction();
+            complaintInstruction.setName(fileName);
+            complaintInstruction.setFilePath(filePath);
 
+            complaint.setComplaintInstruction(complaintInstruction);
 
         } catch (Exception e) {
             throw new CosmosServiceException("Error saving reports: " + e.getMessage());
         }
 
         return complaint;
+    }
+
+    private String getKeyFromInstructionMap(Map<String, MultipartFile> instructionFileMap){
+        String fileName  = "";
+        for (Map.Entry<String, MultipartFile> pair : instructionFileMap.entrySet()) {
+            fileName = pair.getKey();
+        }
+        return fileName;
     }
 
     @Autowired

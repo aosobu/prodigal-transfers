@@ -27,15 +27,28 @@ public class SaveComplaint {
     private SaveComplaintFilter saveComplaintFilter;
 
     @Around(value = "@annotation(Complaint.utilities.SaveComplaint)")
-    public Object saveComplaint(ProceedingJoinPoint pjp) throws Throwable {
+    public List<Complaint> saveComplaint(ProceedingJoinPoint pjp) throws Throwable {
+
+        Object complaintLoggingRequest = null;
+        List<Complaint> complaint = new ArrayList<>();
+        ComplaintLoggingRequest complaintLoggingRequestClone = new ComplaintLoggingRequest();
+
         Object[] arguments = pjp.getArgs();
 
         for(int i = 0; i < arguments.length; i++){
             if(arguments[i] instanceof ComplaintLoggingRequest){
-                pjp.proceed(saveComplaints((ComplaintLoggingRequest) arguments[i]));
+                complaintLoggingRequest = pjp.proceed(saveComplaints((ComplaintLoggingRequest) arguments[i]));
+                List<Complaint> lister =  ((ArrayList) complaintLoggingRequest);
+                complaintLoggingRequestClone.setComplaints(lister);
+                arguments = saveComplaints(complaintLoggingRequestClone);
+                logger.info("Complaint Successfully Saved {} ");
+                //TODO: if complaint is not succesfully saved with tracking number,
+                //TODO: delete entire complaint object and inform user of error
             }
         }
-        return  null;
+
+        complaint.addAll(complaintLoggingRequestClone.getComplaints());
+        return complaint;
     }
 
     private Object[] saveComplaints(ComplaintLoggingRequest complaintLoggingRequest){
@@ -48,7 +61,7 @@ public class SaveComplaint {
             args[0] = complaintLoggingRequest;
 
         } catch (Exception e) {
-            logger.info("Error saving complaints from save aspect {} " + e.getMessage());
+            logger.info("Error Saving Complaints {} " + e.getMessage());
         }
         return args;
     }

@@ -104,6 +104,10 @@ tracking:
   number:
     length: 10
 
+complaint:
+  file:
+    path: uploads/complaints
+
 oauth:
   resource:
     id: autum-settlement-service

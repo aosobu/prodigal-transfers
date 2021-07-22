@@ -4,10 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -15,9 +12,31 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ComplaintTransaction extends BaseTransaction {
+public class ComplaintTransaction{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String accountNumber;
+    private String accountName;
+    private BigDecimal amount;
+    private String narration;
+    private String sessionId;
+    private String tranType;
+    private String tranId;
+    private String sol;
+    private String pan;
+    private String terminalId;
+    private String description;
+    private String rrn;
+    private String stan;
+    private String currencyCode;
+
+    @Temporal(TemporalType.DATE)
+    private Date transactionDate;
+
+    @Temporal(TemporalType.DATE)
+    private Date valueDate;
+
+    private boolean international;
 }

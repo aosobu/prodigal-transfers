@@ -18,6 +18,7 @@ import java.util.List;
 public class LogComplaintController {
 
     private ComplaintLoggingService complaintLoggingService;
+    private ComplaintTransactionServiceImpl complaintTransactionService;
     private TransactionService transactionService;
     private CustomerService customerService;
     private BankServiceImpl bankServiceImpl;
@@ -38,7 +39,7 @@ public class LogComplaintController {
     @ResponseBody
     List<Transaction> checkIfAlreadyLogged(@RequestBody @Valid List<Transaction> transactions) throws ApiException {
         try {
-            return complaintLoggingService.findAlreadyLoggedTxns(transactions);
+            return complaintTransactionService.findAlreadyLoggedTxns(transactions);
         } catch (Exception e) {
             throw new ApiException(e.getMessage());
         }
@@ -96,5 +97,10 @@ public class LogComplaintController {
     @Autowired
     public void setBankServiceImpl(BankServiceImpl bankServiceImpl) {
         this.bankServiceImpl = bankServiceImpl;
+    }
+
+    @Autowired
+    public void setComplaintTransactionService(ComplaintTransactionServiceImpl complaintTransactionService) {
+        this.complaintTransactionService = complaintTransactionService;
     }
 }

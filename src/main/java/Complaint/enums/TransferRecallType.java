@@ -1,8 +1,8 @@
 package Complaint.enums;
 
 public enum TransferRecallType {
-    INTRA("inter"),
-    INTER("intra");
+    INTRA("intra"),
+    INTER("inter");
 
     private String code;
 

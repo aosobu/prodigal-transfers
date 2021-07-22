@@ -1,5 +1,6 @@
 package Complaint.repository.dao;
 
+import Complaint.model.Branch;
 import Complaint.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -29,6 +30,19 @@ public class InfoPoolDao {
         List<Customer> customers = jdbcTemplate.query(sql, new BeanPropertyRowMapper<>(Customer.class));
 
         return customers.get(0);
+    }
+
+    public Branch getBranchInformation(String branchCode) {
+        String sql =
+                "SELECT DISTINCT branch_code, branch_name, branch_classification\n" +
+                        "FROM infopool.dbo.bx_branch_operations_base\n" +
+                        "WHERE branch_code = '" + branchCode + "'";
+
+        List<Branch> branches = jdbcTemplate.query(sql, new Object[]{}, new BeanPropertyRowMapper<>(Branch.class));
+        if (!branches.isEmpty())
+            return branches.get(0);
+        else
+            return null;
     }
 
     @Autowired

@@ -17,15 +17,15 @@ public class SetRecallTypeFilter implements ComplaintRequestFilterProcessor {
 
     @Override
     public boolean isApplicable(Complaint complaint) {
-        return complaint.getRecallType().toString().isEmpty() || complaint.getRecallType() == null;
+        return complaint.getRecallType().isEmpty() || complaint.getRecallType() == null;
     }
 
     @Override
-    public Complaint process(Complaint complaint, List<Map<String, MultipartFile>> fileMap) throws Exception {
-        if(complaint.getBeneficiaryBankCode() == complaint.getTransferringBankCode())
-            complaint.setRecallType(TransferRecallType.INTRA);
+    public Complaint process(Complaint complaint, List<Map<String, MultipartFile>> fileMap) {
+        if(complaint.getBeneficiaryBankCode().equalsIgnoreCase(complaint.getTransferringBankCode()))
+            complaint.setRecallType(TransferRecallType.INTRA.getCode());
         else
-            complaint.setRecallType(TransferRecallType.INTER);
+            complaint.setRecallType(TransferRecallType.INTER.getCode());
 
         return complaint;
     }

@@ -47,7 +47,7 @@ public class Complaint implements MakerCheckerEntity {
     private boolean dirty = false;
     private boolean approved = false;
 
-    private TransferRecallType recallType;
+    private String recallType;
 
     @OneToOne(fetch = FetchType.EAGER,
             orphanRemoval = true,
