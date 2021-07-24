@@ -8,9 +8,18 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+
 
 @Repository
 @Transactional
 public interface ComplaintRepository extends JpaRepository<Complaint, Long>, JpaSpecificationExecutor {
     Long countAllByBranchUserStaffIdAndComplaintStateProcessingStateAndRecallType(String staffId, Long processingState, String recallType);
+    Long countAllByBranchCodeLoggedAndComplaintStateProcessingStateAndRecallType(String staffId, Long processingState, String recallType);
+    Long countAllByBranchCodeLoggedAndCreatedTimeBetween(String branchCodeLogged, String start, String end);
+    Long countAllByBranchCodeLoggedAndComplaintStateProcessingStateAndRecallTypeAndCreatedTimeBetween(String branchCodeLogged,
+                                                                                                      Long complaintProcessingState,
+                                                                                                      String recallType,
+                                                                                                      String start,
+                                                                                                      String end);
 }

@@ -1,8 +1,6 @@
 package Complaint.controller;
 
-import Complaint.model.Branch;
-import Complaint.model.BranchUser;
-import Complaint.model.InfoComplaintStats;
+import Complaint.model.*;
 import Complaint.model.api.DataTableRequest;
 import Complaint.service.BranchUserService;
 import Complaint.service.ComplaintInfoService;
@@ -12,6 +10,7 @@ import com.teamapt.exceptions.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +51,7 @@ public class AppController {
             String user = "ST0673";
             return branchUserService.getUserBranches(user);
         } catch (Exception e) {
-            throw new ApiException("Problem fetching branch information");
+            throw new ApiException("Error Fetching Branch data {}");
         }
     }
 
@@ -61,7 +60,37 @@ public class AppController {
         try {
             return complaintServiceImpl.getBranchLoggedComplaintHistory(request, "P0763");
         } catch (Exception e) {
-            throw new ApiException("Problem fetching branch logged complaints");
+            throw new ApiException("Error Fetching Branch Logged Complaints");
+        }
+    }
+
+    @RequestMapping(value = "branch-users", method = RequestMethod.POST)
+    public @ResponseBody List<BranchUser> getBranchUsers(@RequestBody @Valid List<String> branchCodes) throws ApiException {
+        try {
+            return branchUserService.getBranchUsers(branchCodes);
+        } catch (Exception e) {
+            throw new ApiException("Problem fetching branch user information");
+        }
+    }
+
+    //untested
+    @RequestMapping(value = "group-info-complaint-stats", method = RequestMethod.POST)
+    public @ResponseBody InfoComplaintStats getGroupComplaintStats(@RequestBody @Valid List<Branch> branches) throws ApiException {
+        try {
+            return complaintInfoService.computeGroupInfoComplaintStatistics(branches);
+        } catch (Exception e) {
+            throw new ApiException("Problem fetching group details");
+        }
+    }
+
+    //untested
+    @RequestMapping(value = "branches-complaints-stats", method = RequestMethod.POST)
+    public @ResponseBody
+    BranchesComplaintsStatistics getBranchesComplaintsStats(@RequestBody @Valid BranchStatDateRange branchStatDateRange) throws ApiException {
+        try {
+            return complaintInfoService.getBranchesComplaintsStatistics(branchStatDateRange);
+        } catch (Exception e) {
+            throw new ApiException("Problem fetching branches complaints statistics");
         }
     }
 

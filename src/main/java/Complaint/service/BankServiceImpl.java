@@ -14,12 +14,15 @@ import java.util.List;
 public class BankServiceImpl implements BankService{
 
     private BankRepository bankRepository;
-    private Logger logger = LoggerFactory.getLogger(BankServiceImpl.class);
 
     @Override
     public List<Bank> getAllBanks() {
-        logger.info("Banks {} " + bankRepository.findAll());
         return bankRepository.findAll();
+    }
+
+    @Override
+    public List<Bank> saveAllBanks(List<Bank> bankList) {
+        return bankRepository.saveAll(bankList);
     }
 
     @Autowired

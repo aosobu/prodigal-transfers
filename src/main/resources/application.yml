@@ -54,8 +54,6 @@ logging:
   file:
     name: /Users/aosobu/Documents/ProjectTeamApt/fidelity/transfer-recall/logs/transfer-recall
 
-
-
 #cba configurations
 finacle:
   htd:
@@ -96,6 +94,11 @@ spring:
             bootstrap-mode: deferred
   flyway:
       enabled: true
+
+default:
+  statistics:
+    passed:
+      days: 7
 
 hibernate:
   dialect:

@@ -16,11 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ComplaintServiceImpl implements ComplaintService {
@@ -36,6 +32,23 @@ public class ComplaintServiceImpl implements ComplaintService {
     @Override
     public Long getComplaintsByStaffIdAndProcessingStateAndRecallType(String staffId, Long processingState, String recallType) {
         return complaintRepository.countAllByBranchUserStaffIdAndComplaintStateProcessingStateAndRecallType(staffId, processingState, recallType);
+    }
+
+    @Override
+    public Long getComplaintsByBranchCodeAndProcessingStateAndRecallType(String branchCode, Long processingState, String recallType) {
+        return complaintRepository.countAllByBranchCodeLoggedAndComplaintStateProcessingStateAndRecallType(branchCode,
+                processingState, recallType);
+    }
+
+    @Override
+    public Long getCountByBranchCodeLoggedAndDateRange(String branchCodeLogged, String start, String end) {
+        return complaintRepository.countAllByBranchCodeLoggedAndCreatedTimeBetween(branchCodeLogged, start, end);
+    }
+
+    @Override
+    public Long getCountByBranchCodeLoggedAndComplaintStateAndRecallTypeAndDateRange(String branchCodeLogged, Long complaintProcessingState, String recallType, String start, String end) {
+        return complaintRepository.countAllByBranchCodeLoggedAndComplaintStateProcessingStateAndRecallTypeAndCreatedTimeBetween(branchCodeLogged,
+                complaintProcessingState, recallType, start, end);
     }
 
     @Autowired

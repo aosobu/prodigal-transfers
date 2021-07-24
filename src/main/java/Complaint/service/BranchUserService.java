@@ -2,6 +2,7 @@ package Complaint.service;
 
 import Complaint.model.Branch;
 import Complaint.model.BranchUser;
+import Complaint.model.Staff;
 import Complaint.repository.dao.FinacleDao;
 import Complaint.repository.dao.InfoPoolDao;
 import com.teamapt.exceptions.CosmosServiceException;
@@ -11,14 +12,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
 public class BranchUserService {
 
     Logger logger = LoggerFactory.getLogger(getClass().getName());
+
     private FinacleDao finacleDao;
+
     private InfoPoolDao infoPoolDao;
+
+    private StaffServiceImpl staffServiceImpl;
 
     public BranchUser getUserDetails(String staffId) throws CosmosServiceException {
         try {
@@ -65,6 +71,32 @@ public class BranchUserService {
         return branchList;
     }
 
+    public List<BranchUser> getBranchUsers(List<String> branchCodes) throws CosmosServiceException {
+
+        String branchCodesForQuery = "";
+        for (String branchCode : branchCodes) {
+            branchCodesForQuery += "'" + branchCode + "',";
+        }
+
+        branchCodesForQuery = branchCodesForQuery.substring(0, branchCodesForQuery.length() - 1);
+        List<BranchUser> branchUsers = finacleDao.getBranchUsers(branchCodesForQuery);
+
+        // Remove TrueServe Staff
+        List<Staff> staffs = staffServiceImpl.getAllStaff();
+        HashMap<String, String> staffMap = new HashMap<>();
+        for (Staff staff : staffs)
+            staffMap.put(staff.getStaffId(), staff.getBranchCode());
+
+        // Create new branch list; exclude true serve officials
+        List<BranchUser> newBranchUsers = new ArrayList<>();
+        for (BranchUser branchUser : branchUsers) {
+            if (staffMap.get(branchUser.getStaffId()) == null)
+                newBranchUsers.add(branchUser);
+        }
+
+        return newBranchUsers;
+    }
+
     @Autowired
     public void setFinacleDao(FinacleDao finacleDao) {
         this.finacleDao = finacleDao;
@@ -73,5 +105,10 @@ public class BranchUserService {
     @Autowired
     public void setInfoPoolDao(InfoPoolDao infoPoolDao) {
         this.infoPoolDao = infoPoolDao;
+    }
+
+    @Autowired
+    public void setStaffServiceImpl(StaffServiceImpl staffServiceImpl) {
+        this.staffServiceImpl = staffServiceImpl;
     }
 }

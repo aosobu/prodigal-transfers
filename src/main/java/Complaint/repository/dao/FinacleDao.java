@@ -311,6 +311,25 @@ public class FinacleDao {
         }
     }
 
+    public List<BranchUser> getBranchUsers(String branchCodes) throws CosmosServiceException {
+        try {
+            String finacleQuery = "SELECT a.user_id username,a.sol_id branch_code,a.user_emp_id staff_id,b.emp_email_id email,b.emp_name staff_name\n" +
+                    " FROM " + upr + " a " +
+                    " INNER JOIN " + get + " b ON (a.user_emp_id = b.emp_id) " +
+                    " WHERE a.sol_id IN (" + branchCodes + ")" +
+                    " AND a.entity_cre_flg = 'Y' " +
+                    " AND a.del_flg = 'N'";
+
+            List<BranchUser> result = jdbcTemplate.query(finacleQuery, new BeanPropertyRowMapper<>(BranchUser.class));
+            for (BranchUser b : result)
+                b.setStaffName(WordUtils.capitalizeFully(b.getStaffName()));
+            return result;
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new CosmosServiceException("Problem getting branch users from Finacle.");
+        }
+    }
+
 
     @Autowired
     public void setDataSource(@Qualifier("finacleDs") DataSource dataSource){

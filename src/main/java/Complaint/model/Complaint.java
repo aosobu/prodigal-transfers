@@ -3,9 +3,7 @@ package Complaint.model;
 import Complaint.enums.ApprovalStatus;
 import Complaint.enums.TransferRecallType;
 import com.teamapt.makerchecker.model.MakerCheckerEntity;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -14,6 +12,8 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class Complaint implements MakerCheckerEntity {
 
     @Id
@@ -48,6 +48,7 @@ public class Complaint implements MakerCheckerEntity {
     private boolean approved = false;
 
     private String recallType;
+    private String branchCodeLogged;
 
     @OneToOne(fetch = FetchType.EAGER,
             orphanRemoval = true,
@@ -59,7 +60,7 @@ public class Complaint implements MakerCheckerEntity {
              cascade = CascadeType.PERSIST)
     private ComplaintTransaction complaintTransaction;
 
-    @OneToOne(fetch = FetchType.LAZY,
+    @OneToOne(fetch = FetchType.EAGER,
                 orphanRemoval = true,
               cascade = CascadeType.PERSIST)
     private BranchUser branchUser;

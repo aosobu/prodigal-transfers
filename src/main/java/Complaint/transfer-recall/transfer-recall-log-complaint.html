@@ -1,0 +1,679 @@
+<style>
+    .transaction-list li {
+        list-style: none;
+    }
+
+    .transaction-list .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid rgba(0, 0, 0, 0);
+        border-radius: 4px;
+    }
+
+    .transaction-list .label {
+        border-radius: 3px;
+        font-size: 0.875em;
+        font-weight: 600;
+    }
+
+    .form-inline > * {
+        margin-right: 60px !important;
+    }
+
+    .customer-badge {
+        background: #fff;
+        border: 1px solid #2980b9;
+        padding: 5px;
+        border-radius: 5px;
+        color: #2980b9;
+        width: auto;
+        display: inline-block;
+    }
+
+    .customer-badge p {
+        margin: 0px;
+    }
+
+    .wizard-inner > ul > li {
+        width: 215px;
+    }
+
+    .btn-mini {
+        padding: 7px 18px;
+    }
+
+    .button, .btn, button {
+        border-radius: 2px !important;
+    }
+
+    .table thead > tr > th {
+        text-transform: none;
+    }
+
+    #createComplaintForm .row {
+        margin-bottom: 10px;
+    }
+</style>
+<div class="row" ng-controller="NIPRecallNewComplaintController" data-ng-init="init()">
+
+    <div class="col-lg-12">
+        <div class="main-box clearfix">
+            <header class="main-box-header clearfix">
+
+                <div ng-show="trError" class="alert alert-danger fade in">
+                    <button type="button" class="close" aria-hidden="true" ng-click="hideAlert()">×</button>
+                    <i class="fa fa-times-circle fa-fw fa-lg"></i>
+                    <strong>Error!</strong> {{trErrorMessage}}
+                </div>
+
+                <div ng-show="trSuccess" class="alert alert-success fade in">
+                    <button type="button" class="close" aria-hidden="true" ng-click="hideAlert()">×</button>
+                    <i class="fa fa-check-circle fa-fw fa-lg"></i>
+                    <strong>Success!</strong> {{trSuccessMessage}}
+                </div>
+
+                <!-- progress modal -->
+                <div class="modal fade" id="progressModal" tabindex="-1"
+                     role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">In Progress...</h4>
+                            </div>
+                            <div class="modal-body">
+                                <div class="progress progress-striped active">
+                                    <div class="progress-bar progress-4x" role="progressbar"
+                                         aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"
+                                         style="width: 100%">
+                                        <span class="sr-only">100% Complete</span>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info fade in">
+                                    <button type="button" class="close" data-dismiss="alert"
+                                            aria-hidden="true"></button>
+                                    <span>{{progressMessage}}</span>
+                                </div>
+                            </div>
+                            <div class="modal-footer"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- div class="modal fade in" id="messageModal" tabindex="-1"
+                     role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title"><i class='fa fa-warning fa-fw fa-lg'></i>Info</h4>
+                            </div>
+                            <div class="modal-body">
+                                <d3>{{infoMessage}}</d3>
+                                <div ng-if="infoTransaction != null">
+                                    <dl class="dl-horizontal">
+                                        <h5 class="text-center underline">Transaction Details</h5>
+
+                                        <dt>Tran Type:</dt>
+                                        <dd>{{infoTransaction.tranType == 'C' ? 'Credit' : 'Debit'}}</dd>
+
+                                        <dt>Amount:</dt>
+                                        <dd>{{infoTransaction.amount | number:2}}</dd>
+
+                                        <dt>Narration:</dt>
+                                        <dd>{{infoTransaction.narration}}</dd>
+
+                                        <dt>Session ID:</dt>
+                                        <dd>{{infoTransaction.sessionId}}</dd>
+
+                                        <dt>Group:</dt>
+                                        <dd>{{infoTransaction.ticketGroup.name}}</dd>
+                                    </dl>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    <div>
+                </div -->
+
+            </header>
+            <!-- HEADER -->
+
+            <div class="main-box-body clearfix">
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="main-box clearfix" style="min-height: 820px;">
+
+                            <div class="main-box-body clearfix">
+
+                                <div id="myWizard" class="wizard new-complaint-wizard">
+                                    <!-- Steps -->
+                                    <div class="wizard-inner">
+                                        <ul class="steps" style="margin-left: 0">
+                                            <li data-target="#step1" class="active" ng-click="resetStep1()"><span class="badge badge-primary">1</span>Transaction Details<span class="chevron"></span></li>
+                                            <li data-target="#step2" class="" ng-click=""><span class="badge">2</span>Select Transaction<span class="chevron"></span></li>
+                                            <li data-target="#step3" class="" ng-click=""><span class="badge">3</span>Complaint Details<span class="chevron"></span></li>
+                                            <li data-target="#step4" class=""><span class="badge">4</span>Finish<span class="chevron"></span></li>
+                                        </ul>
+                                        <div class="actions">
+                                            <button type="button" id="cs-prev" class="btn btn-default btn-mini btn-prev" ng-disabled="wizardProgress == 1" ng-click="reverseWizard()">Prev</button>
+                                            <button type="button" id="cs-next" class="btn btn-success btn-mini btn-next" data-last="Finish" ng-disabled="!nextButtonEnabled()" ng-click="advanceWizard()">Next</button>
+                                        </div>
+                                    </div>
+                                    <!-- End Steps -->
+
+                                    <!-- Step Contents -->
+                                    <div class="step-content">
+                                        <!-- STEP 1: Transaction Details  -->
+                                        <div class="step-pane active" id="step1">
+                                            <div class="row">
+                                                <form class="form-inline">
+
+                                                    <div class="form-group col-sm-4 col-sm-offset-1">
+                                                        <input type="text" ng-model="step1AccountNumber"
+                                                               class="form-control full-width" id="acc-no"
+                                                               placeholder="Account Number"
+                                                               maxlength="10">
+                                                    </div>
+
+                                                    <div class="form-group col-sm-5">
+                                                        <div class="input-group full-width">
+                                                            <span class="input-group-addon"><i class="fa fa-calendar-o"></i></span>
+                                                            <input type="text"
+                                                                   class="form-control" id="datepickerDateRange"
+                                                                   placeholder="Date Range">
+                                                            <span class="input-group-btn">
+                                                                <button type="button" class="btn btn-success" ng-disabled="!nextButtonEnabled()" ng-click="advanceWizardClick()">
+                                                                    &#160; <i class="fa fa-search"> &#160;</i>
+                                                                </button>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!--COMMENT OUT UNTIL QUICK FIX INTEGRATION IS RESOLVED-->
+                                                    <!--<div class="form-group col-sm-8 col-sm-offset-1" style="margin-top:20px">-->
+                                                    <!--Select Dispute Type:-->
+                                                    <!--<select style="display:inline-block" ng-model="currentDisputeType" ng-options="disputeObject.issueName for disputeObject in disputeTypes"-->
+                                                    <!--class="customField custom-fields-display form-control" ng-change="onDisputeChanged()">-->
+                                                    <!--</select>-->
+                                                    <!--</div>-->
+
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                        <!-- END STEP 1 -->
+
+                                        <!-- STEP 2 -->
+                                        <div class="step-pane" id="step2">
+                                            <br>
+                                            <div ng-if="complaintTransactionsStep2HasDebit">
+                                                <div class="row" ng-show="complaintTransactionsStep2[0]">
+                                                    <div class="col-sm-12">
+                                                        <div class="customer-badge">
+                                                            <p>
+                                                                <small>
+                                                                    {{complaintTransactionsStep2[0].accountNumber}} -
+                                                                    {{complaintTransactionsStep2[0].accountName}}
+                                                                </small>
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <br>
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped table-hover" id="complaint-transaction-list">
+                                                        <thead>
+                                                        <tr>
+                                                            <th><i class="fa fa-check-circle"></i></th>
+                                                            <th>Narration</th>
+                                                            <th>Amount</th>
+                                                            <th>PAN</th>
+                                                            <th>Transaction</th>
+                                                            <th>Value</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody ng-repeat="transaction in filteredComplaintTransactionsStep2">
+                                                        <tr ng-if="transaction.tranType == 'D'">
+                                                            <td>
+                                                                <div class="checkbox-nice">
+                                                                    <input type="checkbox" id="checkbox-{{$index}}"
+                                                                           ng-model="transaction.selected"
+                                                                           ng-click="checkForReversalAndPassedDays(transaction)">
+                                                                    <label for="checkbox-{{$index}}"></label>
+                                                                </div>
+                                                            </td>
+                                                            <td>{{transaction.narration}}</td>
+                                                            <td>
+                                                                {{transaction.amount | number:2}}
+                                                            </td>
+                                                            <td>{{transaction.pan}}</td>
+                                                            <td>{{transaction.transactionDate | date:"MMM dd, yyyy"}}</td>
+                                                            <td>{{transaction.valueDate | date:"MMM dd, yyyy"}}</td>
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="alert alert-danger" ng-if="!complaintTransactionsStep2HasDebit">
+                                                <strong>No transactions found...</strong>
+                                            </div>
+                                        </div>
+                                        <!-- /.STEP 2 -->
+
+                                        <!-- STEP 3 -->
+                                        <div class="step-pane" id="step3">
+                                            <div class="row">
+
+                                                <form class="form-horizontal"
+                                                      role="form"
+                                                      name="createComplaintForm"
+                                                      id="createComplaintForm"
+                                                      ng-submit="logComplaints()"
+                                                      novalidate>
+
+                                                    <div class="row padding-top-bottom-20">
+
+                                                        <div class="col-sm-6 border-right-grey">
+
+                                                            <header class="main-box-header clearfix">
+                                                                <h2>Customer Name</h2>
+                                                            </header>
+                                                            <div class="main-box-body clearfix form-horizontal">
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-12">
+                                                                        <label for="customerAccountName">Account Name / Name of Petitioner / Name of Complainant <span class="required">*</span></label>
+                                                                        <input type="text"
+                                                                               ng-model="customerStep3.accountName"
+                                                                               class="form-control"
+                                                                               id="customerAccountName"
+                                                                               name="customerAccountName"
+                                                                               disabled required>
+                                                                        <small class="error" ng-show="createComplaintForm.customerAccountName.$error.required">required</small>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Name of Complainant / Petitioner / Account Name -->
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-12">
+                                                                        <label for="customerConsultantName">Name of Consultant</label>
+                                                                        <input type="text"
+                                                                               ng-model="customerStep3.consultantName"
+                                                                               class="form-control"
+                                                                               id="customerConsultantName"
+                                                                               name="customerConsultantName"
+                                                                               data-toggle="tooltip"
+                                                                               data-placement="bottom"
+                                                                               title="Name of Consultant that is handling the complaint on behalf of the Complainant or Petitioner.">
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Name of Consultant -->
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-4">
+                                                                        <label for="customerFirstName">First Name <span class="required">*</span></label>
+                                                                        <input type="text" ng-model="customerStep3.firstName"
+                                                                               class="form-control"
+                                                                               id="customerFirstName"
+                                                                               name="customerFirstName"
+                                                                               required>
+                                                                        <small class="error" ng-show="createComplaintForm.customerFirstName.$error.required && createComplaintForm.customerFirstName.$dirty">This field is required</small>
+                                                                    </div>
+                                                                    <!-- First Name -->
+
+                                                                    <div class="col-sm-4">
+                                                                        <label class="customerMiddleName">Middle Name</label>
+                                                                        <input type="text" ng-model="customerStep3.middleName"
+                                                                               class="form-control"
+                                                                               id="customerMiddleName"
+                                                                               name="customerMiddleName">
+                                                                        <small class="error" ng-show="createComplaintForm.customerMiddleName.$error.required && createComplaintForm.customerMiddleName.$dirty">This field is required</small>
+                                                                    </div>
+                                                                    <!-- Middle Name -->
+
+                                                                    <div class="col-sm-4">
+                                                                        <label class="customerLastName">Last Name <span class="required">*</span></label>
+                                                                        <input type="text" ng-model="customerStep3.lastName"
+                                                                               class="form-control"
+                                                                               id="customerLastName"
+                                                                               name="customerLastName"
+                                                                               required>
+                                                                        <small class="error" ng-show="createComplaintForm.customerLastName.$error.required && createComplaintForm.customerLastName.$dirty">This field is required</small>
+                                                                    </div>
+                                                                    <!-- Last Name -->
+                                                                </div>
+                                                                <!-- Names -->
+
+                                                            </div>
+                                                            <!-- Customer Name -->
+
+                                                            <header class="main-box-header clearfix">
+                                                                <h2>Customer Contact Information</h2>
+                                                            </header>
+                                                            <div class="main-box-body clearfix form-horizontal">
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-12">
+                                                                        <label for="customerEmail">Email <span class="required">*</span></label>
+                                                                        <input type="email" ng-model="customerStep3.email"
+                                                                               class="form-control"
+                                                                               id="customerEmail"
+                                                                               name="customerEmail"
+                                                                               required>
+                                                                        <small class="error" ng-show="createComplaintForm.customerEmail.$error.required && createComplaintForm.customerEmail.$dirty">This field is required</small>
+                                                                        <small class="error" ng-show="createComplaintForm.customerEmail.$error.email">Enter a valid email</small>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Email -->
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <label for="customerCellPhoneNumber">Cell Phone Number <span class="required">*</span></label>
+                                                                        <input type="text" ng-model="customerStep3.phone"
+                                                                               class="form-control"
+                                                                               id="customerCellPhoneNumber"
+                                                                               name="customerCellPhoneNumber"
+                                                                               ng-minlength="3" ng-maxlength="30"
+                                                                               ng-pattern="/^\+?[0-9]*$/"
+                                                                               required>
+                                                                        <small class="error" ng-show="createComplaintForm.customerCellPhoneNumber.$error.required && createComplaintForm.customerCellPhoneNumber.$dirty">This field is required</small>
+                                                                        <small class="error" ng-show="!createComplaintForm.customerCellPhoneNumber.$error.required && (createComplaintForm.customerCellPhoneNumber.$error.minlength || createComplaintForm.customerCellPhoneNumber.$error.maxlength) && createComplaintForm.customerCellPhoneNumber.$dirty">Phone no. cannot be more than 30 characters or less than 5.</small>
+                                                                        <small class="error" ng-show="!createComplaintForm.customerCellPhoneNumber.$error.minLength && !createComplaintForm.customerCellPhoneNumber.$error.maxLength && createComplaintForm.customerCellPhoneNumber.$error.pattern && createComplaintForm.customerCellPhoneNumber.$dirty">Numbers only.</small>
+                                                                    </div>
+                                                                    <!-- Cell Phone Number -->
+
+                                                                    <div class="col-sm-6">
+                                                                        <label for="customerOfficePhoneNumber">Office Phone Number</label>
+                                                                        <input type="text" ng-model="customerStep3.officePhone"
+                                                                               class="form-control"
+                                                                               id="customerOfficePhoneNumber"
+                                                                               name="customerOfficePhoneNumber"
+                                                                               ng-minlength="3" ng-maxlength="30"
+                                                                               ng-pattern="/^\+?[0-9]*$/">
+                                                                        <small class="error" ng-show="!createComplaintForm.customerOfficePhoneNumber.$error.required && (createComplaintForm.customerOfficePhoneNumber.$error.minlength || createComplaintForm.customerOfficePhoneNumber.$error.maxlength) && createComplaintForm.customerOfficePhoneNumber.$dirty">Phone no. cannot be more than 30 characters or less than 5.</small>
+                                                                        <small class="error" ng-show="!createComplaintForm.customerOfficePhoneNumber.$error.minLength && !createComplaintForm.customerOfficePhoneNumber.$error.maxLength && createComplaintForm.customerOfficePhoneNumber.$error.pattern && createComplaintForm.customerOfficePhoneNumber.$dirty">Numbers only.</small>
+                                                                    </div>
+                                                                    <!-- Office Phone Number -->
+                                                                </div>
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-12">
+                                                                        <label for="customerAddressLine1">Address Line 1 <span class="required">*</span></label>
+                                                                        <input type="text" ng-model="customerStep3.addressLine1"
+                                                                               class="form-control"
+                                                                               id="customerAddressLine1"
+                                                                               name="customerAddressLine1"
+                                                                               required>
+                                                                        <small class="error" ng-show="createComplaintForm.customerAddressLine1.$error.required && createComplaintForm.customerAddressLine1.$dirty">This field is required</small>
+                                                                    </div>
+                                                                    <!-- Address Line 1 -->
+
+                                                                    <div class="col-sm-12">
+                                                                        <label for="customerAddressLine2">Address Line 2</label>
+                                                                        <input type="text" ng-model="customerStep3.addressLine2"
+                                                                               class="form-control"
+                                                                               id="customerAddressLine2"
+                                                                               name="customerAddressLine2">
+                                                                    </div>
+                                                                    <!-- Address Line 2 -->
+                                                                </div>
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <label for="customerCity">City <span class="required">*</span></label>
+                                                                        <input type="text" ng-model="customerStep3.city"
+                                                                               class="form-control"
+                                                                               id="customerCity"
+                                                                               name="customerCity"
+                                                                               required>
+                                                                        <small class="error" ng-show="createComplaintForm.customerCity.$error.required && createComplaintForm.customerCity.$dirty">This field is required</small>
+                                                                    </div>
+                                                                    <!-- City -->
+
+                                                                    <div class="col-sm-6">
+                                                                        <label for="customerState">State <span class="required">*</span></label>
+                                                                        <select ng-model="customerStep3.state"
+                                                                                ng-options="state for state in states"
+                                                                                class="form-control"
+                                                                                id="customerState"
+                                                                                name="customerState"
+                                                                                required></select>
+                                                                        <small class="error" ng-show="createComplaintForm.customerState.$error.required && createComplaintForm.customerState.$dirty">This field is required</small>
+                                                                    </div>
+                                                                    <!-- State -->
+                                                                </div>
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <label for="customerCountry">Country <span class="required">*</span></label>
+                                                                        <select ng-model="customerStep3.country"
+                                                                                ng-options="country as country.name for country in countries track by country.id"
+                                                                                ng-value="country.code"
+                                                                                class="form-control"
+                                                                                id="customerCountry"
+                                                                                name="customerCountry"
+                                                                                required></select>
+                                                                        <small class="error" ng-show="createComplaintForm.customerCountry.$error.required && createComplaintForm.customerCountry.$dirty">This field is required</small>
+                                                                    </div>
+                                                                    <!-- Country -->
+
+                                                                    <div class="col-sm-6">
+                                                                        <label for="customerPostalCode">Postal Code</label>
+                                                                        <input type="text" ng-model="customerStep3.postalCode"
+                                                                               class="form-control"
+                                                                               id="customerPostalCode"
+                                                                               name="customerPostalCode">
+                                                                    </div>
+                                                                    <!-- Postal Code -->
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+                                                        <!-- Customer Contact Information -->
+
+                                                        <!-- Beneficiary Details -->
+                                                        <div class="col-sm-6">
+
+                                                            <header class="main-box-header clearfix">
+                                                                <h2>Beneficiary Details</h2>
+                                                            </header>
+                                                            <div class="main-box-body clearfix form-horizontal">
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <label for="customerComplaintChannel">Channel <span class="required">*</span></label>
+                                                                        <select ng-model="customerStep3.channel"
+                                                                                ng-options="channel as channel.name for channel in channels track by channel.id"
+                                                                                ng-value="channel.code"
+                                                                                class="form-control"
+                                                                                id="customerComplaintChannel"
+                                                                                name="customerComplaintChannel" required></select>
+                                                                        <small class="error" ng-show="createComplaintForm.customerComplaintChannel.$error.required && createComplaintForm.customerComplaintChannel.$dirty">This field is required</small>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Complaint Channel -->
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-6">
+                                                                        <label for="beneficiaryBank">Beneficiary Bank <span class="required">*</span></label>
+                                                                        <select ng-model="customerStep3.beneficiaryFI"
+                                                                                ng-options="bank as bank.bankName for bank in banks track by bank.bankCode"
+                                                                                ng-value="bank.bankCode"
+                                                                                class="form-control"
+                                                                                id="beneficiaryBank"
+                                                                                name="beneficiaryBank" required></select>
+                                                                        <small class="error" ng-show="createComplaintForm.beneficiaryBank.$error.required && createComplaintForm.beneficiaryBank.$dirty">This field is required</small>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Beneficiary Bank -->
+
+                                                                <!-- Beneficiary Name -->
+                                                                <div class="row">
+                                                                    <div class="col-sm-12">
+                                                                        <label for="beneficiaryAcctNum">Beneficiary Account Number <span class="required">*</span></label>
+                                                                        <input type="text" ng-model="customerStep3.beneficiaryAccountNumber"
+                                                                               class="form-control"
+                                                                               id="beneficiaryAcctNum"
+                                                                               name="beneficiaryAcctNum"
+                                                                               ng-minlength="10" ng-maxlength="10"
+                                                                               ng-pattern="/^\+?[0-9]*$/">
+                                                                        <small class="error" ng-show="createComplaintForm.beneficiaryAcctNum.$error.required && createComplaintForm.beneficiaryAcctNum.$dirty">This field is required</small>
+                                                                        <small class="error" ng-show="!createComplaintForm.beneficiaryAcctNum.$error.required && (createComplaintForm.beneficiaryAcctNum.$error.minlength || createComplaintForm.beneficiaryAcctNum.$error.maxlength) && createComplaintForm.beneficiaryAcctNum.$dirty">Phone no. cannot be more or less than 11 characters</small>
+                                                                        <small class="error" ng-show="!createComplaintForm.beneficiaryAcctNum.$error.minLength && !createComplaintForm.beneficiaryAcctNum.$error.maxLength && createComplaintForm.beneficiaryAcctNum.$error.pattern && createComplaintForm.beneficiaryAcctNum.$dirty">Numbers only.</small>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Beneficiary Account Number -->
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-12">
+                                                                        <label for="beneficiaryFullName">Beneficiary Full Name <span class="required">*</span></label>
+                                                                        <input type="text" ng-model="customerStep3.beneficiaryName"
+                                                                               class="form-control"
+                                                                               id="beneficiaryFullName"
+                                                                               name="beneficiaryFullName"
+                                                                               data-toggle="tooltip"
+                                                                               data-placement="bottom"
+                                                                               title="Provide the beneficiary full name"
+                                                                               required>
+                                                                        <small class="error" ng-show="createComplaintForm.beneficiaryFullName.$error.required && createComplaintForm.beneficiaryFullName.$dirty">This field is required</small>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Beneficiary Full Name -->
+
+                                                                <div class="row">
+                                                                    <div class="col-sm-12">
+                                                                        <label for="petitionerPrayer">Petitioner's Prayer <span class="required">*</span></label>
+                                                                        <textarea rows="5" ng-model="customerStep3.complainantPrayer"
+                                                                                  class="form-control"
+                                                                                  id="petitionerPrayer"
+                                                                                  name="petitionerPrayer"
+                                                                                  data-toggle="tooltip"
+                                                                                  data-placement="bottom"
+                                                                                  title="State in clear and specific words what the petitioner requires from the bank."
+                                                                                  required>
+                                                                                    <small class="error" ng-show="createComplaintForm.petitionerPrayer.$error.required && createComplaintForm.petitionerPrayer.$dirty">This field is required</small>
+                                                                        </textarea>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- Petitioner's Prayer -->
+
+                                                                <!--- customer instruction -->
+                                                                <div class="row">
+                                                                    <div class="col-sm-12">
+                                                                        <label for="customerInstruction">Upload Customer Instruction <span class="required">*</span></label>
+                                                                        <input name="customerInstruction"
+                                                                               type="file"
+                                                                               class="form-control"
+                                                                               id="customerInstruction"
+                                                                               accept=".pdf,.doc,.txt"
+                                                                               file-model="fileContent.customerInstruction"
+                                                                               ng-mouseleave="!checkCustomerInstruction()">
+                                                                        <small class="error" ng-show="!checkCustomerInstruction()">This field is required</small>
+                                                                    </div>
+                                                                </div>
+                                                                <!-- customer instruction -->
+
+                                                            </div>
+                                                            <!-- Complaint Details -->
+
+                                                        </div>
+                                                        <!-- Beneficiary Details -->
+
+
+                                                    </div>
+                                                    <!-- CUSTOMER INFORMATION FORM -->
+
+                                                    <header class="main-box-header clearfix">
+                                                        <h2>Complaint Transaction List</h2>
+                                                    </header>
+                                                    <div class="main-box-body clearfix transaction-list">
+
+                                                        <div ng-if="complaintTransactionsStep3.length > 0">
+                                                            <div class="row">
+                                                                <div class="customer-badge">
+                                                                    <p>
+                                                                        <small>
+                                                                            {{complaintTransactionsStep3[0].accountNumber}} -
+                                                                            {{complaintTransactionsStep3[0].accountName}}
+                                                                        </small>
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <br>
+                                                            <div class="table-responsive">
+                                                                <table class="table table-striped table-hover" id="verify-transaction-list">
+                                                                    <thead>
+                                                                    <tr>
+                                                                        <th>#</th>
+                                                                        <th>Amount</th>
+                                                                        <th>Tran ID</th>
+                                                                        <th>Transaction</th>
+                                                                        <th>Value</th>
+                                                                        <th class="text-center">Status</th>
+                                                                    </tr>
+                                                                    </thead>
+                                                                    <tbody ng-repeat="transaction in complaintTransactionsStep3">
+                                                                    <tr>
+                                                                        <td>{{$index + 1}}</td>
+                                                                        <td>
+                                                                            {{transaction.amount | number:2}}
+                                                                        </td>
+                                                                        <td>{{transaction.tranId}}</td>
+                                                                        <td>{{transaction.transactionDate | date:"MMM dd, yyyy"}}</td>
+                                                                        <td>{{transaction.valueDate | date:"MMM dd, yyyy"}}</td>
+                                                                        <td class="text-center">
+                                                                            <span ng-if="transaction.alreadyLoggedComplaint != null" class="label label-danger">Already Logged</span>
+                                                                            <span ng-if="transaction.alreadyLoggedComplaint == null" class="label label-success">OK To Log</span>
+                                                                        </td>
+                                                                    </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                            <!-- Transactions to be Logged -->
+                                                        </div>
+                                                        <div class="alert alert-danger" ng-if="complaintTransactionsStep3.length == 0">
+                                                            <strong>No transactions found...</strong>
+                                                        </div>
+
+                                                    </div>
+                                                    <!-- TRANSACTION LIST -->
+
+                                                </form>
+
+                                            </div>
+                                        </div>
+                                        <!-- /.STEP 3 -->
+
+                                        <!-- STEP 4 -->
+                                        <div class="step-pane" id="step4">
+                                            <br>
+                                            <div ng-if="trLogSuccess" class="alert alert-success" style="margin: 50px 0;">
+                                                <i class="fa fa-check-circle fa-fw fa-lg"></i>
+                                                {{trLogSuccessMessage}}
+                                            </div>
+
+                                            <div ng-if="trLogError" class="alert alert-danger">
+                                                <i class="fa fa-times-circle fa-fw fa-lg"></i>
+                                                {{trLogErrorMessage}}
+                                            </div>
+                                        </div>
+                                        <!-- /.STEP 4 -->
+                                    </div>
+                                    <!-- End Step Contents -->
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

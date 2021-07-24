@@ -25,7 +25,9 @@ public class ComplaintLoggingService {
         for(ComplaintRequestFilterProcessor aComplaintRequestFilterProcessor : complaintRequestFilterProcessors){
             for(Complaint complaint: complaints) {
                 try {
-                    aComplaintRequestFilterProcessor.process(complaint, complaintLoggingRequest.getMultipartFiles());
+                    if(aComplaintRequestFilterProcessor.isApplicable(complaint)) {
+                        aComplaintRequestFilterProcessor.process(complaint, complaintLoggingRequest.getMultipartFiles());
+                    }
                 } catch (Exception e) {
                     logger.info("Error executing a complaint request filter processor {} " +
                             aComplaintRequestFilterProcessor.getComplaintRequestFilterProcessorName());
