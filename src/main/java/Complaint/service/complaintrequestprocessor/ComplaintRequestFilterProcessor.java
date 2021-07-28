@@ -9,8 +9,6 @@ import java.util.Map;
 public interface ComplaintRequestFilterProcessor {
 
     String getComplaintRequestFilterProcessorName();
-
     boolean isApplicable(Complaint complaint);
-
     Complaint process(Complaint complaint, List<Map<String, MultipartFile>> fileMap) throws Exception;
 }

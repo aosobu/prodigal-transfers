@@ -12,6 +12,7 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 @Getter
 @Setter
 public class Complaint implements MakerCheckerEntity {
@@ -44,11 +45,16 @@ public class Complaint implements MakerCheckerEntity {
     private String assigneeName;
     private Date assignedDate;
 
+    // Resolve data
+
     private boolean dirty = false;
     private boolean approved = false;
 
     private String recallType;
     private String branchCodeLogged;
+
+    @Transient
+    private String errorMessage;
 
     @OneToOne(fetch = FetchType.EAGER,
             orphanRemoval = true,

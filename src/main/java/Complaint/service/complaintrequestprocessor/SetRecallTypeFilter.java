@@ -17,11 +17,11 @@ public class SetRecallTypeFilter implements ComplaintRequestFilterProcessor {
 
     @Override
     public boolean isApplicable(Complaint complaint) {
-        return complaint.getRecallType().isEmpty() || complaint.getRecallType() == null;
+        return complaint.getRecallType() == null || complaint.getRecallType().isEmpty();
     }
 
     @Override
-    public Complaint process(Complaint complaint, List<Map<String, MultipartFile>> fileMap) {
+    public Complaint process(Complaint complaint, List<Map<String, MultipartFile>> fileMap) throws Exception {
         if(complaint.getBeneficiaryBankCode().equalsIgnoreCase(complaint.getTransferringBankCode()))
             complaint.setRecallType(TransferRecallType.INTRA.getCode());
         else

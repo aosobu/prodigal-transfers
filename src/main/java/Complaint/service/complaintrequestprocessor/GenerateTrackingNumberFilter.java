@@ -35,7 +35,7 @@ public class GenerateTrackingNumberFilter implements ComplaintRequestFilterProce
         return generateTrackingNumber(complaint);
     }
 
-    public Complaint generateTrackingNumber(Complaint complaint) throws CosmosServiceException {
+    public Complaint generateTrackingNumber(Complaint complaint) throws Exception {
             String complaintIdStr = complaint.getId().toString();
             if (complaintIdStr.length() >= trackingNumberLength)
                 throw new CosmosServiceException("Error generating tracking number");

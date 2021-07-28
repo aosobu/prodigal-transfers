@@ -12,12 +12,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class InfoComplaintStats {
 
-    private Long unassignedIntraComplaints;
-    private Long assignedIntraComplaints;
+    private Long totalComplaints;
     private Long unassignedInterComplaints;
-    private Long assignedInterComplaints;
-    private Long processingInterComplaints;
-    private Long processingIntraComplaints;
-    private Long branchComplaintsHistory;
-    private Long resolvedCount;
+    private Long unassignedIntraComplaints;
+    private Long inProcessingComplaints;
+    private Long resolvedComplaints;
+    private Long totalLoggedInCurrentDay;
 }

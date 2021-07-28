@@ -8,9 +8,9 @@ server:
 #datasource configurations`
 datasource:
   primary:
-    jdbc-url: jdbc:sqlserver://localhost:1433;databaseName=transfer_recall
+    jdbc-url: jdbc:sqlserver://192.168.41.71:1433;databaseName=transfer_recall_v2
     username: sa
-    password: Sam2019$
+    password: t3@mApt
     testOnBorrow: true
     validation-query: SELECT 1
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver

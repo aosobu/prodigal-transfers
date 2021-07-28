@@ -24,7 +24,6 @@ public class ComplaintServiceImpl implements ComplaintService {
     private ComplaintRepository complaintRepository;
 
     @Override
-    @Transactional
     public Complaint saveComplaint(Complaint complaint) {
        return complaintRepository.save(complaint);
     }
@@ -51,10 +50,42 @@ public class ComplaintServiceImpl implements ComplaintService {
                 complaintProcessingState, recallType, start, end);
     }
 
+    @Override
+    public void deleteComplaint(Complaint complaint) {
+        complaintRepository.delete(complaint);
+    }
+
+    @Override
+    public Long countAllComplaintsByStaffId(String staffId) {
+        return complaintRepository.countAllByBranchUserStaffId(staffId);
+    }
+
+    @Override
+    public Long countAllComplaintsByBranchCode(String branchCode) {
+        return complaintRepository.countAllByBranchUserBranchCode(branchCode);
+    }
+
+    @Override
+    public Long countAllByProcessingState(Long processingState) {
+        return complaintRepository.countAllByComplaintStateProcessingState(processingState);
+    }
+
+    @Override
+    public Long countAllComplaints() {
+        return complaintRepository.count();
+    }
+
+    @Override
+    public Long countAllByProcessingStateAndRecallType(Long processingstate, String recallType) {
+        return complaintRepository.countAllByComplaintStateProcessingStateAndRecallType(processingstate, recallType);
+    }
+
     @Autowired
     public void setComplaintRepository(ComplaintRepository complaintRepository) {
         this.complaintRepository = complaintRepository;
     }
+
+
 
     public Map<String, Object> getBranchLoggedComplaintHistory(DataTableRequest request, String staffId) {
         Specifications<Complaint> baseSearchSpecs = Specifications.where(ComplaintSpecsBranch.base(null, request.getBranches()));

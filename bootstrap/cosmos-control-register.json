@@ -9,20 +9,14 @@
         },
         {
             "role": {
-                "name": "AS_TRANSFER_RECALL_ASSIGNER",
-                "friendlyName": "Transfer Recall Assigner"
+                "name": "AS_TRANSFER_RECALL_AUTHORIZER",
+                "friendlyName": "Transfer Recall Authorizer"
             }
         },
         {
             "role": {
-                "name": "AS_TRANSFER_RECALL_ASSIGNEE",
-                "friendlyName": "Transfer Recall Assignee"
-            }
-        },
-        {
-            "role": {
-                "name": "AS_TRANSFER_RECALL_CSO",
-                "friendlyName": "Transfer Recall CSO"
+                "name": "AS_TRANSFER_RECALL_INPUTTER",
+                "friendlyName": "Transfer Recall Inputter"
             }
         },
         {
@@ -42,9 +36,9 @@
         },
         {
             "authority": {
-                "authority": "as_tr_assign_complaint",
-                "friendlyName": "Assign Complaint",
-                "description": "Assign a complaint to a staff"
+                "authority": "as_tr_approve_complaint",
+                "friendlyName": "Approve Complaint",
+                "description": "Approve Complaint"
             }
         },
         {
@@ -89,41 +83,33 @@
             "authorities": [
                 "as_tr_view_module",
                 "as_tr_log_complaint",
-                "as_tr_assign_complaint",
                 "as_tr_resolve_complaint",
+                "as_tr_approve_complaint",
                 "as_tr_view_settings",
                 "as_tr_update_settings",
                 "as_tr_view_all"
             ]
         },
         {
-            "role": "AS_TRANSFER_RECALL_ASSIGNER",
+            "role": "AS_TRANSFER_RECALL_AUTHORIZER",
             "authorities": [
                 "as_tr_view_module",
-                "as_tr_assign_complaint",
-                "as_tr_resolve_complaint"
+                "as_tr_resolve_complaint",
+                "as_tr_approve_complaint"
             ]
         },
         {
-            "role": "AS_TRANSFER_RECALL_ASSIGNEE",
-            "authorities": [
-                "as_tr_view_module",
-                "as_tr_resolve_complaint"
-            ]
+          "role": "AS_TRANSFER_RECALL_INPUTTER",
+          "authorities": [
+            "as_tr_view_module",
+            "as_tr_log_complaint"
+          ]
         },
         {
-            "role": "AS_TRANSFER_RECALL_CSO",
-            "authorities": [
-                "as_tr_view_module",
-                "as_tr_log_complaint"
-            ]
-        },
-        {
-            "role": "AS_TRANSFER_RECALL_VIEW_ONLY",
-            "authorities": [
-                "as_tr_view_module",
-                "as_tr_view_all"
-            ]
+          "role": "AS_TRANSFER_RECALL_VIEW_ONLY",
+          "authorities": [
+            "as_tr_view_all"
+          ]
         }
     ]
 }

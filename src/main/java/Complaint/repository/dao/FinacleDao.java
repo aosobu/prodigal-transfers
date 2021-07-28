@@ -156,6 +156,8 @@ public class FinacleDao {
         return formatTransactions(transactions);
     }
 
+    //TODO:: Refactor to use an interface canled TransactionFormatter
+    //TODO: Dissolve monster method
     private List<Transaction> formatTransactions(List<Transaction> transactions) {
         for (Transaction txn : transactions) {
             try {

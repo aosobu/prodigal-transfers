@@ -20,6 +20,9 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long>, Jpa
     Long countAllByBranchCodeLoggedAndComplaintStateProcessingStateAndRecallTypeAndCreatedTimeBetween(String branchCodeLogged,
                                                                                                       Long complaintProcessingState,
                                                                                                       String recallType,
-                                                                                                      String start,
-                                                                                                      String end);
+                                                                                                      String start, String end);
+    Long countAllByBranchUserStaffId(String staffId);
+    Long countAllByBranchUserBranchCode(String branchCode);
+    Long countAllByComplaintStateProcessingState(Long processingState);
+    Long countAllByComplaintStateProcessingStateAndRecallType(Long processingState, String recallType);
 }

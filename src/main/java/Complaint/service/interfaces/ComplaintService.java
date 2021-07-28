@@ -11,4 +11,10 @@ public interface ComplaintService {
     Long getComplaintsByBranchCodeAndProcessingStateAndRecallType(String branchCode, Long processingState, String rcallType);
     Long getCountByBranchCodeLoggedAndDateRange(String branchCodeLogged, String start, String end);
     Long getCountByBranchCodeLoggedAndComplaintStateAndRecallTypeAndDateRange(String branchCodeLogged, Long complaintProcessingState, String recallType, String start, String end);
+    void deleteComplaint(Complaint complaint);
+    Long countAllComplaintsByStaffId(String staffId);
+    Long countAllComplaintsByBranchCode(String branchCode);
+    Long countAllByProcessingState(Long processingState);
+    Long countAllComplaints();
+    Long countAllByProcessingStateAndRecallType(Long processingstate, String recallType);
 }

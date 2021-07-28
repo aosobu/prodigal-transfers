@@ -17,8 +17,4 @@ public enum SchemeType {
     public String getSchemeType() {
         return schemeType;
     }
-
-    public void setSchemeType(String schemeType) {
-        this.schemeType = schemeType;
-    }
 }

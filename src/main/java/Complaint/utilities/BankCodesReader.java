@@ -18,8 +18,8 @@ public class BankCodesReader {
     private Logger logger = LoggerFactory.getLogger(BankCodesReader.class);
 
     public List<Bank> getBanks(){
-        String path = "/Users/aosobu/Documents/ProjectTeamApt/fidelity/transfer-recall/config/bank_codes.csv"; //config/bank_codes.csv"
-        //String path = "config/bank_codes.csv";
+        //String path = "/Users/aosobu/Documents/ProjectTeamApt/fidelity/transfer-recall/config/bank_codes.csv"; //config/bank_codes.csv"
+        String path = "config/bank_codes.csv";
         List<Bank> banks = new ArrayList<>();
 
         BufferedReader fileReader = null;

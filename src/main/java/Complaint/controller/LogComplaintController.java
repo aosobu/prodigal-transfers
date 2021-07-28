@@ -5,12 +5,15 @@ import Complaint.model.api.AccountDateRange;
 import Complaint.model.api.ComplaintLoggingRequest;
 import Complaint.service.*;
 import com.teamapt.exceptions.ApiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,6 +25,7 @@ public class LogComplaintController {
     private TransactionService transactionService;
     private CustomerService customerService;
     private BankServiceImpl bankServiceImpl;
+    private Logger logger = LoggerFactory.getLogger(LogComplaintController.class);
 
     @RequestMapping(value = "complaint-transactions", method = RequestMethod.POST)
     public
@@ -65,17 +69,23 @@ public class LogComplaintController {
         }
     }
 
-    //@PreAuthorize("hasAuthority('as_cs_log_complaint')")
     @RequestMapping(value = "log-complaints", method = RequestMethod.POST)
-    public List<Complaint> logComplaint(@RequestParam("complaint") String complaint,
+    public List<Complaint> logComplaint(@RequestParam("complaints") String complaint,
                                         @RequestParam("customerInstruction") MultipartFile file,
                                         @RequestParam("customerInstructionName") String fileName
                                         ) throws ApiException {
+        ComplaintLoggingRequest complaintLoggingRequest = null;
+
         try {
-            ComplaintLoggingRequest complaintLoggingRequest = ComplaintLoggingRequest.with(complaint, file, fileName, "");
+            complaintLoggingRequest = ComplaintLoggingRequest.with(complaint, file, fileName, "");
+        } catch (Exception e) {
+            throw new ApiException(e.getMessage());
+        }
+
+        try {
             return complaintLoggingService.logComplaint(complaintLoggingRequest);
         } catch (Exception e) {
-            throw new ApiException(e);
+            throw new ApiException(e.getMessage());
         }
     }
 

@@ -6,6 +6,7 @@ import Complaint.service.ComplaintServiceImpl;
 import Complaint.utilities.DatesUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -16,21 +17,17 @@ public class SaveComplaintFilter{
 
     ComplaintServiceImpl complaintServiceImpl;
 
-    public List<Complaint> process(List<Complaint> complaint) throws Exception {
+    @Transactional
+    public List<Complaint> process(List<Complaint> complaints) throws Exception {
         List<Complaint> complaintList = new ArrayList<>();
         Complaint savedComplaint = new Complaint();
 
-        for (Complaint aComplaint : complaint) {
-            try {
+        for (Complaint aComplaint : complaints) {
                 setDateTimes(aComplaint);
                 savedComplaint = complaintServiceImpl.saveComplaint(aComplaint);
                 if(savedComplaint.getId() > 0){
                     complaintList.add(savedComplaint);
                 }
-            }
-            catch (Exception e) {
-                throw new Exception("Error saving complaint {} ");
-            }
         }
         return complaintList;
     }
