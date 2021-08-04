@@ -3,6 +3,8 @@ package Complaint.service.interfaces;
 import Complaint.model.Complaint;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 public interface ComplaintService {
 
@@ -17,4 +19,6 @@ public interface ComplaintService {
     Long countAllByProcessingState(Long processingState);
     Long countAllComplaints();
     Long countAllByProcessingStateAndRecallType(Long processingstate, String recallType);
+    Optional<Complaint> getComplaint(Long id);
+    List<Complaint> getComplaintByProcessingStateAndRecallTypeAndApprovalStatus(Long processingState, String recallType, int approvalStatus);
 }

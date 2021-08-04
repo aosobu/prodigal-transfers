@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 
 
 @Repository
@@ -25,4 +26,5 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long>, Jpa
     Long countAllByBranchUserBranchCode(String branchCode);
     Long countAllByComplaintStateProcessingState(Long processingState);
     Long countAllByComplaintStateProcessingStateAndRecallType(Long processingState, String recallType);
+    List<Complaint> getAllByComplaintStateProcessingStateAndRecallTypeAndApprovalStatus(Long processingState, String recallType, int approvalStatus);
 }

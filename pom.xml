@@ -158,6 +158,11 @@
 			<artifactId>base-prototypes</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>com.teamapt</groupId>
+			<artifactId>finacle-poster-lib</artifactId>
+			<version>1.0.0.RELEASE</version>
+		</dependency>
         <!--dependency>
             <groupId>com.teamapt</groupId>
             <artifactId>cosmos-control-lib</artifactId>

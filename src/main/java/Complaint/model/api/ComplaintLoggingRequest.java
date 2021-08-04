@@ -1,9 +1,11 @@
 package Complaint.model.api;
 
+import Complaint.model.Branch;
 import Complaint.model.BranchUser;
 import Complaint.model.Complaint;
 import Complaint.service.BranchUserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.teamapt.exceptions.ApiException;
 import com.teamapt.exceptions.CosmosServiceException;
@@ -38,9 +40,9 @@ public class ComplaintLoggingRequest {
 
     public static ComplaintLoggingRequest with(String complaint, MultipartFile file, String fileName, String initiator) throws Exception {
         ComplaintLoggingRequest request= new ComplaintLoggingRequest();
-        initiator = "P1222"; // hard coded for test
+        initiator = "ST0673"; // hard coded for test
 
-        request.setComplaints(Collections.singletonList(getComplaintObjects(complaint)));
+        request.setComplaints(Collections.singletonList(getComplaintObjects(complaint).get(0)));
         request.getComplaints().get(0).getBranchUser().setStaffId(initiator);
         process(request.getComplaints().get(0));
         if(!file.isEmpty() && !fileName.isEmpty()){
@@ -52,17 +54,17 @@ public class ComplaintLoggingRequest {
         return request;
     }
 
-    private static Complaint getComplaintObjects(String jsonComplaint) throws ApiException {
+    private static List<Complaint> getComplaintObjects(String jsonComplaint) throws ApiException {
         ObjectMapper mapper = new ObjectMapper();
-        Complaint complaint = new Complaint();
+        List<Complaint> complaints = new ArrayList<>();
         try {
-            complaint = mapper.readValue(jsonComplaint, Complaint.class);
+            complaints = mapper.readValue(jsonComplaint, new TypeReference<List<Complaint>>(){});
         } catch (JsonProcessingException e) {
             throw new ApiException("Log complaint failed due to error encountered parsing complaint object {} ");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return complaint;
+        return complaints;
     }
 
     public static Complaint process(Complaint complaint) throws Exception {

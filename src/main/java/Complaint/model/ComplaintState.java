@@ -3,6 +3,7 @@ package Complaint.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -19,17 +20,23 @@ public class ComplaintState {
     private Long processingState = 0l;
     private Date timeEmailToBeneficiaryBankSent;
     private Date timeEmailReceivedFromBeneficiaryBankSent;
-    private String messageSentToBeneficiaryBank;
-    private String messageReceivedFromBeneficiaryBank;
     private Date timeEmailToCustomerSent;
     private Date timeAcknowledgementFromCustomerReceived;
     private Date resolvedTime;
     private Date timeLienPlace;
-    private Boolean isLienPlaced;
-    private Boolean isMailSentToBeneficiaryBank;
-    private Boolean isBeneficiaryBankAcknowledgmentReceived;
-    private Boolean isMailSentToCustomer;
-    private Boolean isCustomerAcknowledgmentReceived;
-    private Boolean isMailSentToBankStaff;
-    private Boolean isComplaintResolved;
+    private String messageSentToBeneficiaryBank = "";
+    private String messageReceivedFromBeneficiaryBank = "";
+    private Boolean isLienPlaced = false;
+    private Boolean isMailSentToBeneficiaryBank = false;
+    private Boolean isBeneficiaryBankAcknowledgmentReceived = false;
+    private Boolean isMailSentToCustomer = false;
+    private Boolean isCustomerAcknowledgmentReceived = false;
+    private Boolean isMailSentToBankStaff = false;
+    private Boolean isComplaintResolved = false;
+    private int retrySendEmailCount = 0;
+    private int retryDebitAccountCount = 0;
+    private Boolean isComplainantAccountCredited = false;
+    private Boolean isDefendantAccountDebited = false;
+    private BigDecimal amountCreditedToCustomer = new BigDecimal(0.0);
+    private BigDecimal amountDebitedFromDefendat = new BigDecimal(0.0);
 }

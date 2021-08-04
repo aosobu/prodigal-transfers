@@ -1,15 +1,12 @@
 package Complaint.controller;
 
-import Complaint.enums.Role;
 import Complaint.model.*;
 import Complaint.model.api.DataTableRequest;
-import Complaint.service.BranchUserService;
-import Complaint.service.ComplaintInfoService;
-import Complaint.service.ComplaintServiceImpl;
-import Complaint.service.interfaces.ComplaintService;
+import Complaint.service.*;
 import com.teamapt.exceptions.ApiException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -23,9 +20,10 @@ public class AppController {
     private ComplaintInfoService complaintInfoService;
     private BranchUserService branchUserService;
     private ComplaintServiceImpl complaintServiceImpl;
+    private ComplaintApprovalService approvalService;
+    private ComplaintDeclineHandler complaintDeclineHandler;
 
-
-    @RequestMapping(value = "user-info-complaint-stats/{staffId}", method = RequestMethod.GET)
+    @RequestMapping(value = "user-info-complaint-stats", method = RequestMethod.POST)
     public @ResponseBody InfoComplaintStats getUserComplaintStats(@RequestParam("staffId") String staffId,
                                                                   @RequestParam("roleType") String role) throws ApiException {
         try {
@@ -35,12 +33,11 @@ public class AppController {
         }
     }
 
-
     @RequestMapping(value = "user-details", method = RequestMethod.GET)
     public @ResponseBody BranchUser getUserDetails() throws ApiException {
         try {
             //for test purpose but will be gotten via the principal
-            String user = "P122";
+            String user = "ST0673";
             return branchUserService.getUserDetails(user);
         } catch (Exception e) {
             throw new ApiException("Error Fetching User Details {} ");
@@ -48,52 +45,84 @@ public class AppController {
     }
 
     @RequestMapping(value = "group-info-complaint-stats", method = RequestMethod.POST)
-    public @ResponseBody InfoComplaintStats getGroupComplaintStats(@RequestParam("roleType") String role,
-                                                                   @RequestParam("branches") @Valid List<Branch> branches) throws ApiException {
+    public @ResponseBody InfoComplaintStats getGroupComplaintStats(@RequestParam("role") String role,
+                                                                   @RequestParam("branches") String branch) throws ApiException {
         try {
+            List<Branch> branches = GroupComplaintStatsRequests.getBranchObjects(branch);
             return complaintInfoService.computeGroupInfoComplaintStatistics(role, branches);
         } catch (Exception e) {
-            throw new ApiException("Problem fetching group details");
+            throw new ApiException("Error Fetching Group Complaint Statistics");
         }
     }
 
-//    @RequestMapping(value = "user-branches", method = RequestMethod.GET)
-//    public @ResponseBody List<Branch> getUserBranches(Principal principal) throws ApiException {
-//        try {
-//            String user = "ST0673";
-//            return branchUserService.getUserBranches(user);
-//        } catch (Exception e) {
-//            throw new ApiException("Error Fetching Branch data {}");
-//        }
-//    }
-//
-//    @RequestMapping(value = "branch-logged-complaints", method = RequestMethod.POST)
-//    public @ResponseBody Map<String, Object> getBranchLoggedComplaints(@RequestBody DataTableRequest request, Principal principal) throws ApiException {
-//        try {
-//            return complaintServiceImpl.getBranchLoggedComplaintHistory(request, "P0763");
-//        } catch (Exception e) {
-//            throw new ApiException("Error Fetching Branch Logged Complaints");
-//        }
-//    }
-//
-//    @RequestMapping(value = "branch-users", method = RequestMethod.POST)
-//    public @ResponseBody List<BranchUser> getBranchUsers(@RequestBody @Valid List<String> branchCodes) throws ApiException {
-//        try {
-//            return branchUserService.getBranchUsers(branchCodes);
-//        } catch (Exception e) {
-//            throw new ApiException("Problem fetching branch user information");
-//        }
-//    }
-//
-//    @RequestMapping(value = "branches-complaints-stats", method = RequestMethod.POST)
-//    public @ResponseBody
-//    BranchesComplaintsStatistics getBranchesComplaintsStats(@RequestBody @Valid BranchStatDateRange branchStatDateRange) throws ApiException {
-//        try {
-//            return complaintInfoService.getBranchesComplaintsStatistics(branchStatDateRange);
-//        } catch (Exception e) {
-//            throw new ApiException("Problem fetching branches complaints statistics");
-//        }
-//    }
+    @RequestMapping(value = "user-branches", method = RequestMethod.GET)
+    public @ResponseBody List<Branch> getUserBranches(Principal principal) throws ApiException {
+        try {
+            String user = "ST0673";
+            return branchUserService.getUserBranches(user);
+        } catch (Exception e) {
+            throw new ApiException("Error Fetching Branch data {}");
+        }
+    }
+
+    @RequestMapping(value = "complaints-admin", method = RequestMethod.POST)
+    public @ResponseBody Map<String, Object> getAdminOrAuthorizerComplaints(@RequestBody DataTableRequest request) throws ApiException {
+        try {
+            return complaintServiceImpl.getUnassignedComplaintHistory(request);
+        } catch (Exception e) {
+            throw new ApiException("Error Fetching Complaints {}");
+        }
+    }
+
+    @RequestMapping(value = "branch-logged-complaints", method = RequestMethod.POST)
+    public @ResponseBody Map<String, Object> getBranchLoggedComplaints(@RequestBody DataTableRequest request, Principal principal) throws ApiException {
+        try {
+            String staffId = principal.getName();
+            return complaintServiceImpl.getLoggedComplaints(request, staffId);
+        } catch (Exception e) {
+            throw new ApiException("Error Fetching Complaints {}");
+        }
+    }
+
+    @RequestMapping(value = "approve", method = RequestMethod.POST)
+    public @ResponseBody String approveComplaints(@RequestBody List<String> complaintIds, Principal principal) throws ApiException {
+        try {
+
+            return approvalService.approveComplaints(complaintIds, principal.getName());
+        } catch (Exception e) {
+            throw new ApiException("Error Approving Complaints {}" + e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "decline-complaints", method = RequestMethod.POST)
+    public @ResponseBody String declineComplaints(@RequestBody List<String> complaintIds, Principal principal) throws ApiException {
+        try {
+
+            return complaintDeclineHandler.declineComplaints(complaintIds, principal.getName());
+        } catch (Exception e) {
+            throw new ApiException("Error Declining Complaints {}" + e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "update-complaints", method = RequestMethod.POST)
+    public @ResponseBody String updateComplaints(@RequestBody List<String> complaintIds, Principal principal) throws ApiException {
+        try {
+            return null;
+        } catch (Exception e) {
+            throw new ApiException("Error Updating Complaints {}");
+        }
+    }
+
+    @RequestMapping(value = "bulk-upload-update-complaints", method = RequestMethod.POST)
+    public @ResponseBody String bulkUploadUpdateComplaints(@RequestParam("bulkUploadFile") MultipartFile bulkUploadFile,
+                                                           Principal principal) throws ApiException {
+        try {
+
+            return null;
+        } catch (Exception e) {
+            throw new ApiException("Error Approving Complaints {}");
+        }
+    }
 
     @Autowired
     public void setComplaintInforService(ComplaintInfoService complaintInfoService) {
@@ -108,5 +137,15 @@ public class AppController {
     @Autowired
     public void setComplaintServiceImpl(ComplaintServiceImpl complaintServiceImpl) {
         this.complaintServiceImpl = complaintServiceImpl;
+    }
+
+    @Autowired
+    public void setApprovalService(ComplaintApprovalService approvalService) {
+        this.approvalService = approvalService;
+    }
+
+    @Autowired
+    public void setComplaintDeclineHandler(ComplaintDeclineHandler complaintDeclineHandler) {
+        this.complaintDeclineHandler = complaintDeclineHandler;
     }
 }

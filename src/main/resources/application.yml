@@ -8,9 +8,9 @@ server:
 #datasource configurations`
 datasource:
   primary:
-    jdbc-url: jdbc:sqlserver://192.168.41.71:1433;databaseName=transfer_recall_v2
+    jdbc-url: jdbc:sqlserver://localhost:1433;databaseName=transfer_recall
     username: sa
-    password: t3@mApt
+    password: Sam2019$
     testOnBorrow: true
     validation-query: SELECT 1
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -95,6 +95,7 @@ spring:
   flyway:
       enabled: true
 
+#general app configurations
 default:
   statistics:
     passed:
@@ -117,6 +118,38 @@ oauth:
 
   verifier:
     key: -----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAskW18478JOqsJretRDk8I2R97e34qgwUt9DM3AAZdaskiL2ygZfCTumYY90tjvvU3ypZcNvvtrJ54g+utCTdfzIPmFIQzMD83zbONd4YctI+7a0yqzQ8GZUKgvdcsj2DQ0GqtsKm6yJ21VLJr9PIaGRjp67/9Wi6PCg0IJLBH0NNsO4NhdtPK804zgB0VZlJuWRBM1Iu0NC6OKmmKogYDnQfzvdFXGWpcF/1Thf/9cTIW+BTOG0Kf5DQrs/MMv1CWSTiFvmFchMl7OrkFMQqqMx0FsAz3ZF49+N3HYAISUPbdjWScYOBPUZzj+p19Sw2fSEHQlLFM/Au3/GC3tzeXQIDAQAB\n-----END PUBLIC KEY-----
+
+bank:
+  email:
+    staff: Oladapo.Onayemi@fidelitybank.ng,Chukwudi.Ochuba@fidelitybank.ng
+
+app:
+  is:
+    dev: false
+
+recall:
+  intra:
+    funds:
+      interval: 60000
+
+send:
+  email:
+    recall:
+      interval: 120000
+
+oauth2:
+  server:
+    token:
+      endpoint: http://10.10.5.33:8085/oauth/token
+
+Oauth:
+  client:
+    id: autum-settlement-service
+    secret: secret
+
+bulk:
+  upload:
+    url: http://192.168.41.72:8088/api/v1/bulk-transactions/upload
 
 
 

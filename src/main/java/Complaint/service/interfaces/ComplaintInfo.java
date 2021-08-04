@@ -1,7 +1,5 @@
 package Complaint.service.interfaces;
 
-import Complaint.enums.ComplaintProcessingState;
-import Complaint.enums.TransferRecallType;
 import Complaint.model.Branch;
 import Complaint.model.InfoComplaintStats;
 

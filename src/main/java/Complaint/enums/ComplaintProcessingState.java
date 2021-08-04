@@ -2,17 +2,15 @@ package Complaint.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
 public enum ComplaintProcessingState {
 
     NEW(0l),
-    ASSIGNED(1l),
-    PROCESSING(2l),
-    RESOLVED(3l),
-    FAILED(4l);
+    PROCESSING(1l),
+    RESOLVED(2l),
+    DECLINED(3l);
 
     private Long value;
 

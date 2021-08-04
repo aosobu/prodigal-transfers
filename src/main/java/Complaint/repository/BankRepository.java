@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BankRepository extends JpaRepository<Bank, Long>, JpaSpecificationExecutor {
+    Bank findByBankCode(String bankCode);
 }

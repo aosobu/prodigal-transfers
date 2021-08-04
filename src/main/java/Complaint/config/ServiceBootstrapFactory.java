@@ -3,6 +3,7 @@ package Complaint.config;
 import Complaint.model.Bank;
 import Complaint.service.BankServiceImpl;
 import Complaint.service.complaintrequestprocessor.ComplaintRequestFilterProcessor;
+import Complaint.service.interfaces.ComplaintApproval;
 import Complaint.utilities.BankCodesReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,9 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 public class ServiceBootstrapFactory {
@@ -28,6 +31,15 @@ public class ServiceBootstrapFactory {
         requestList.addAll(requests);
         logger.info("Complaint Request Filter Processors {} " + requestList.size());
         return requestList;
+    }
+
+    @Bean(name = "complaintApprovalMap")
+    public Map<String, ComplaintApproval> complaintApprovalMap(List<ComplaintApproval> approvals){
+        Map<String, ComplaintApproval> approvalsMap = new HashMap<>();
+        for (ComplaintApproval approval: approvals) {
+            approvalsMap.put(approval.getRecallType(), approval);
+        }
+        return approvalsMap;
     }
 
     @PostConstruct

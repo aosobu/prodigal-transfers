@@ -1,11 +1,12 @@
 package Complaint.service;
 
+import Complaint.enums.ApprovalStatus;
 import Complaint.model.Complaint;
 import Complaint.model.api.DataTableColumn;
 import Complaint.model.api.DataTableOrder;
 import Complaint.model.api.DataTableRequest;
 import Complaint.repository.ComplaintRepository;
-import Complaint.repository.ComplaintSpecsBranch;
+import Complaint.repository.SpecificationBuilderFactory;
 import Complaint.service.interfaces.ComplaintService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,7 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.*;
@@ -80,15 +80,37 @@ public class ComplaintServiceImpl implements ComplaintService {
         return complaintRepository.countAllByComplaintStateProcessingStateAndRecallType(processingstate, recallType);
     }
 
+    @Override
+    public Optional<Complaint> getComplaint(Long id) {
+        return complaintRepository.findById(id);
+    }
+
+    @Override
+    public List<Complaint>  getComplaintByProcessingStateAndRecallTypeAndApprovalStatus(Long processingState, String recallType, int approvalStatus) {
+        return complaintRepository.getAllByComplaintStateProcessingStateAndRecallTypeAndApprovalStatus(processingState, recallType, approvalStatus);
+    }
+
     @Autowired
     public void setComplaintRepository(ComplaintRepository complaintRepository) {
         this.complaintRepository = complaintRepository;
     }
 
+    public Map<String, Object> getUnassignedComplaintHistory(DataTableRequest request) {
+        Specifications<Complaint> baseSearchSpecs = SpecificationBuilderFactory.getBaseSpecification(request);
 
+        int page = request.getStart() / request.getLength();
+        Specifications<Complaint> searchSpecs = getComplaintSpecs(request, baseSearchSpecs);
+        Sort sort = getSortSpecs(request);
+        Page<Complaint> requests = complaintRepository.findAll(searchSpecs, new CustomPageRequest(page, request.getLength(), sort));
+        Map<String, Object> summary = new HashMap<>();
+        summary.put("totalPages", requests.getTotalPages());
+        summary.put("data", requests.getContent());
 
-    public Map<String, Object> getBranchLoggedComplaintHistory(DataTableRequest request, String staffId) {
-        Specifications<Complaint> baseSearchSpecs = Specifications.where(ComplaintSpecsBranch.base(null, request.getBranches()));
+        return summary;
+    }
+
+    public Map<String, Object> getLoggedComplaints(DataTableRequest request, String staffId) {
+        Specifications<Complaint> baseSearchSpecs = SpecificationBuilderFactory.getSpecificationForBranchLoggedComplaints(request, staffId);
 
         int page = request.getStart() / request.getLength();
         Specifications<Complaint> searchSpecs = getComplaintSpecs(request, baseSearchSpecs);

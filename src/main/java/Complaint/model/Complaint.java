@@ -6,6 +6,7 @@ import com.teamapt.makerchecker.model.MakerCheckerEntity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -26,15 +27,17 @@ public class Complaint implements MakerCheckerEntity {
     private String beneficiaryBankCode;
     private String transferringBankCode;
     private String complaintReason;
-    private ApprovalStatus approvalStatus;
+    private BigDecimal amountToBeRecalled;
+    private BigDecimal amountTransferred;
+    private int approvalStatus;
 
     @Column(unique = true)
     private String trackingNumber;
 
-    private Date authorisationDate;
-    private String authoriserBranch;
-    private String authoriserName;
-    private String authoriserStaffId;
+    private Date authorisationOrDeclineDate;
+    private String authoriserOrDeclinerBranch;
+    private String authoriserOrDeclinerName;
+    private String authoriserOrDeclinerStaffId;
     private String createdTime;
     private String updatedTime;
 
@@ -45,7 +48,11 @@ public class Complaint implements MakerCheckerEntity {
     private String assigneeName;
     private Date assignedDate;
 
-    // Resolve data
+    // Resolution data
+    private Date resolutionDate;
+    private String resolvedBy;
+    private String resolverStaffId;
+    private String resolutionMessage;
 
     private boolean dirty = false;
     private boolean approved = false;

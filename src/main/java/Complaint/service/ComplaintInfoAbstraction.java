@@ -5,9 +5,10 @@ import Complaint.enums.TransferRecallType;
 import Complaint.model.InfoComplaintStats;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
-public abstract class ComplaintInfoAbstraction {
+@Service
+public class ComplaintInfoAbstraction {
 
     private ComplaintServiceImpl complaintService;
 

@@ -19,4 +19,7 @@ public class DataTableRequest {
     private List<DataTableColumn> search;
     private DataTableOrder sort;
     private List<String> branches;
+    private String role;
+    private String recallType;
+    private Long processingState;
 }
