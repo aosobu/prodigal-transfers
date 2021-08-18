@@ -4,11 +4,12 @@ import Complaint.model.*;
 import Complaint.model.api.DataTableRequest;
 import Complaint.service.*;
 import com.teamapt.exceptions.ApiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ public class AppController {
     private ComplaintServiceImpl complaintServiceImpl;
     private ComplaintApprovalService approvalService;
     private ComplaintDeclineHandler complaintDeclineHandler;
+    private Logger logger = LoggerFactory.getLogger(AppController.class);
 
     @RequestMapping(value = "user-info-complaint-stats", method = RequestMethod.POST)
     public @ResponseBody InfoComplaintStats getUserComplaintStats(@RequestParam("staffId") String staffId,
@@ -38,9 +40,10 @@ public class AppController {
         try {
             //for test purpose but will be gotten via the principal
             String user = "ST0673";
+            logger.info("User Id " + user);
             return branchUserService.getUserDetails(user);
         } catch (Exception e) {
-            throw new ApiException("Error Fetching User Details {} ");
+            throw new ApiException("Error Fetching User Details {} " + e.getMessage());
         }
     }
 
@@ -75,10 +78,9 @@ public class AppController {
     }
 
     @RequestMapping(value = "branch-logged-complaints", method = RequestMethod.POST)
-    public @ResponseBody Map<String, Object> getBranchLoggedComplaints(@RequestBody DataTableRequest request, Principal principal) throws ApiException {
+    public @ResponseBody Map<String, Object> getBranchLoggedComplaints(@RequestBody DataTableRequest request) throws ApiException {
         try {
-            String staffId = principal.getName();
-            return complaintServiceImpl.getLoggedComplaints(request, staffId);
+            return complaintServiceImpl.getLoggedComplaints(request, request.getStaffId());
         } catch (Exception e) {
             throw new ApiException("Error Fetching Complaints {}");
         }

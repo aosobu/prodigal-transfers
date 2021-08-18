@@ -60,5 +60,4 @@ public class ServiceBootstrapFactory {
         this.bankCodesReader = bankCodesReader;
     }
 
-
 }

@@ -53,7 +53,7 @@ public class ComplaintSpecsBranch {
                 }
 
                 if(staffId != null){
-                   predicate = builder.equal(root.join(Complaint_.branchUser).get(BranchUser_.branchCode), staffId);
+                   predicate = builder.equal(root.join(Complaint_.branchUser).get(BranchUser_.staffId), staffId);
                 }
 
                 return predicate;

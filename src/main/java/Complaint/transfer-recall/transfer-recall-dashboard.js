@@ -30,47 +30,47 @@ app.controller('TransferRecallDashboardController', ['$scope', '$sce', '$rootSco
         $scope.groupInfoComplaintStatistics = [];
         $scope.currentBranchUsers = [];
 
-        $scope.groupUnassignedIntraComplaints = 0;
-        $scope.groupAssignedIntraComplaints = 0;
-        $scope.groupUnassignedInterComplaints = 0;
-        $scope.groupAssignedInterComplaints = 0;
-        $scope.groupProcessingInterComplaints = 0;
-        $scope.groupProcessingIntraComplaints = 0;
-        $scope.groupBranchComplaintsHistory = 0;
-        $scope.groupResolvedCount = 0;
-
-        $scope.personalUnassignedIntraComplaints = 0;
-        $scope.personalAssignedIntraComplaints = 0;
+        //variables for personal info statistics
         $scope.personalUnassignedInterComplaints = 0;
-        $scope.personalAssignedInterComplaints = 0;
-        $scope.personalProcessingInterComplaints = 0;
-        $scope.personalProcessingIntraComplaints = 0;
-        $scope.personalBranchComplaintsHistory = 0;
-        $scope.personalResolvedCount = 0;
+        $scope.personalBranchHistoryComplaints = 0;
+        $scope.personalInProcessingComplaints = 0;
+        $scope.personalResolvedComplaints = 0;
+        $scope.personalTotalComplaints = 0;
+        $scope.personalUnassignedIntraComplaints = 0;
+
+        //variables for personal info statistics
+        $scope.groupUnassignedInterComplaints = 0;
+        $scope.groupBranchHistoryComplaints = 0;
+        $scope.groupInProcessingComplaints = 0;
+        $scope.groupResolvedComplaints = 0;
+        $scope.groupTotalComplaints = 0;
+        $scope.groupUnassignedIntraComplaints = 0;
 
         $scope.userInfoComplaintStatistics = [];
         $scope.branchesComplaintStatistics = [];
 
-        $scope.branchesComplaintsTotal = 0;
-        $scope.branchesComplaintsTotalResolvedInter = 0;
-        $scope.branchesComplaintsTotalResolvedIntra = 0;
-        $scope.branchesComplaintsTotalUnassignedInter = 0;
-        $scope.branchesComplaintsTotalUnassignedIntra = 0;
-        $scope.branchesComplaintsTotalPendingInter = 0;
-        $scope.branchesComplaintsTotalPendingIntra = 0;
-
-        $scope.branchesComplaintsBarChart = {};
-        $scope.branchesComplaintsBarChart.data = [[0, 0, 0, 0, 0]];
-        $scope.branchesComplaintsBarChart.colours = [{fillColor: ['#46BFBD', '#F1C40F', '#F7464A', '#2ECC71', '#292929']}];
-        $scope.branchesComplaintsBarChart.series = ['Series A'];
-        $scope.branchesComplaintsBarChart.labels = ['Pending', 'Approaching TAT', 'Passed TAT', 'Closed Within TAT', 'Closed Passed TAT'];
-        $scope.branchesComplaintsBarChart.legend = false;
-        $scope.branchesComplaintsBarChart.options = {
-            animation: true
-        };
 
         $scope.multipleBranches = false;
         $scope.noBranches = false;
+
+        $scope.currentTreatComplaint = [];
+        $scope.deskMode = false;
+        $scope.complaintResolutionReasons = [];
+
+        //data structure for selected ids
+        $scope.interRecallIds = {};
+        $scope.intraRecallIds = {};
+
+
+        //show progress modal
+        $scope.showProgress = function (action, message) {
+            $scope.progressMessage = message;
+            if (action) {
+                $('#progressModal').modal('show');
+            } else {
+                $('#progressModal').modal('hide');
+            }
+        };
 
         $scope.init = function () {
 
@@ -80,20 +80,11 @@ app.controller('TransferRecallDashboardController', ['$scope', '$sce', '$rootSco
             $scope.branchStatRange = $filter('date')(new Date(moment().day(-7)), "yyyy-MM-dd") + " : " + $filter('date')(new Date(), "yyyy-MM-dd");
 
             $scope.showProgress(true, "Initializing");
-            $scope.trLoadCounter = 2;
+            $scope.trLoadCounter = 1;
+
             $scope.getUserDetails();
-            $scope.getUserBranches();
-
+            $scope.fetchUserBranches();
         }; // end of init function
-
-        $scope.showProgress = function (action, message) {
-            $scope.progressMessage = message;
-            if (action) {
-                $('#progressModal').modal('show');
-            } else {
-                $('#progressModal').modal('hide');
-            }
-        };
 
         $scope.getUserDetails = function () {
             if ($scope.trLoadCounter <= 0) {
@@ -126,9 +117,27 @@ app.controller('TransferRecallDashboardController', ['$scope', '$sce', '$rootSco
                         });
 
                         $scope.currentUser = data;
-                        if ($scope.isHeadOffice()) {
+
+                        if ($scope.currentUser != undefined || $scope.currentUser != null) {
                             $scope.trLoadCounter += 1;
-                            $scope.getPersonalInfoComplaintStatisticsData($scope.currentUser.staffId);
+
+                            var formData = new FormData();
+
+                            if($scope.isAdminOrAuthorizer()){
+
+                                formData.append("staffId", $scope.currentUser.staffId);
+                                formData.append("roleType", "admin");
+                                $scope.fetchPersonalInfoComplaintStatisticsData(formData);
+
+                            }else if($scope.isInputter() || $scope.isViewer()){
+
+                                formData.append("staffId", $scope.currentUser.staffId);
+                                formData.append("roleType", "non-admin");
+                                $scope.fetchPersonalInfoComplaintStatisticsData(formData);
+
+                            }
+                        }else{
+                            PNotifyService.error("Failed to get user details.");
                         }
                     } else {
                         PNotifyService.error("Failed to get user details.");
@@ -149,12 +158,13 @@ app.controller('TransferRecallDashboardController', ['$scope', '$sce', '$rootSco
         }; // end of get user details
 
         // Get User's Statistical Data
-        $scope.getPersonalInfoComplaintStatisticsData = function (staffId) {
+        $scope.fetchPersonalInfoComplaintStatisticsData = function (formData) {
             if ($scope.trLoadCounter <= 0) {
                 $scope.showProgress(true, "Fetching Personal Complaint Statistics...");
             }
+
             TransferRecallDashboardService.getPersonalInfoComplaintStatisticsData(
-                staffId,
+                formData,
                 function (data, status) {
                     if (status == 200 || status == 201) {
                         $scope.userInfoComplaintStatistics = data;
@@ -179,34 +189,81 @@ app.controller('TransferRecallDashboardController', ['$scope', '$sce', '$rootSco
             );
         };
 
-        $scope.getUserBranches = function () {
-            if ($scope.trLoadCounter <= 0) {
+
+        /*****1
+         * Role Checker Section
+         * @returns {*|boolean}
+         */
+        $scope.isAdminOrAuthorizer = function () {
+            return AuthServerProvider.isInRole('as_tr_resolve_complaint') && AuthServerProvider.isInRole('as_tr_approve_complaint');
+        };
+        $scope.isInputter = function () {
+            return AuthServerProvider.isInRole('as_tr_log_complaint');
+        };
+        $scope.isViewer = function () {
+            return AuthServerProvider.isInRole('as_tr_view_all');
+        };
+        $scope.isBranchAdmin = function () {
+            return AuthServerProvider.isInRole('as_tr_branch_admin');
+        };
+
+
+        /**
+         * set statistical information
+         * @param stats
+         */
+        $scope.setPersonalStatisticsVariables = function (stats) {
+            $scope.personalUnassignedInterComplaints = stats.unassignedInterComplaints;
+            $scope.personalBranchHistoryComplaints = stats.branchHistoryComplaints;
+            $scope.personalInProcessingComplaints = stats.inProcessingComplaints;
+            $scope.personalResolvedComplaints = stats.resolvedComplaints;
+            $scope.personalTotalComplaints = stats.totalComplaints;
+            $scope.personalUnassignedIntraComplaints = stats.unassignedIntraComplaints;
+        };
+
+        $scope.setGroupStatisticsVariables = function (stats) {
+            $scope.groupUnassignedInterComplaints = stats.unassignedInterComplaints;
+            $scope.groupBranchHistoryComplaints = stats.branchHistoryComplaints;
+            $scope.groupInProcessingComplaints = stats.inProcessingComplaints;
+            $scope.groupResolvedComplaints = stats.resolvedComplaints;
+            $scope.groupTotalComplaints = stats.totalComplaints;
+            $scope.groupUnassignedIntraComplaints = stats.unassignedIntraComplaints;
+        };
+
+
+        /**
+         * get group info
+         */
+        // Get User's Branches
+        $scope.fetchUserBranches = function () {
+            if ($scope.trLoadCounter <= 0) { // Initialization has finished
                 $scope.showProgress(true, "Fetching user branches");
             }
             TransferRecallDashboardService.getUserBranches(
                 function (data, status) {
                     if (status == 200 || status == 201) {
                         $scope.userBranches = data;
+
                         $scope.initializeWithBranchData($scope.userBranches, false);
                     } else {
                         PNotifyService.error("Failed to get branches.");
                     }
-                    if ($scope.trLoadCounter <= 0) {
+                    if ($scope.trLoadCounter <= 0) { // Initialization has finished
                         $scope.showProgress(false);
                     }
                     $scope.trLoadCounter--;
                 },
                 function (data, status) {
                     PNotifyService.error(data.description);
-                    if ($scope.trLoadCounter <= 0) {
+                    if ($scope.trLoadCounter <= 0) { // Initialization has finished
                         $scope.showProgress(false);
                     }
                     $scope.trLoadCounter--;
                 }
             );
-        }; //end of get user branches
+        };
 
-
+        // Initialize dashboard data using branches
         $scope.initializeWithBranchData = function (userBranches, showInitModal) {
 
             if (showInitModal) {
@@ -220,20 +277,17 @@ app.controller('TransferRecallDashboardController', ['$scope', '$sce', '$rootSco
                 $scope.noBranches = false;
                 $scope.currentBranch = userBranches[0];
                 $rootScope.PageTitle = "Dashboard - " + $scope.currentBranch.branchName + " (" + $scope.currentBranch.branchCode + ")";
-                $scope.trLoadCounter += 3;
 
                 branchCodes = [];
                 $scope.branchCodesForTable = [];
                 branchCodes.push($scope.currentBranch.branchCode);
                 $scope.branchCodesForTable.push($scope.currentBranch.branchCode);
-                $scope.fetchBranchLoggedComplaintsManual();
 
-                // Load Personnel in User's Branch
-                $scope.getBranchUsers(branchCodes);
-                // Load User's Group's Info Complaint Data
-                $scope.getGroupInfoComplaintStatisticsData(userBranches);
-                // Get Branch(es) statistics
-                $scope.getBranchesComplaintsStatistics(userBranches, "");
+                //get Group Infor statistics for Admin, Inputter or branch admin
+                $scope.fetchGroupInfoComplaintStatisticsData(userBranches);
+
+                //get complaint data for Admin, Inputter or Branch Admin
+                $scope.getComplaints();
 
             } else if (userBranches.length > 1) {
                 // Get multiple branch details
@@ -248,14 +302,12 @@ app.controller('TransferRecallDashboardController', ['$scope', '$sce', '$rootSco
                     branchCodes.push(branch.branchCode);
                     $scope.branchCodesForTable.push(branch.branchCode);
                 });
-                $scope.fetchBranchLoggedComplaintsManual();
 
-                // Load Personnel in User's Branches
-                $scope.getBranchUsers(branchCodes);
-                // Load User's Group's Info Complaint Data
-                $scope.getGroupInfoComplaintStatisticsData(userBranches);
-                //Get Branch(es) statistics
-                $scope.getBranchesComplaintsStatistics(userBranches, "");
+                //get Group Infor statistics for Admin, Inputter or branch admin
+                $scope.fetchGroupInfoComplaintStatisticsData(userBranches);
+
+                //get complaint data for Admin, Inputter or Branch Admin
+                $scope.getComplaints();
 
             } else {
                 // No branches for that user
@@ -263,90 +315,34 @@ app.controller('TransferRecallDashboardController', ['$scope', '$sce', '$rootSco
                 $scope.noBranches = true;
                 $rootScope.PageTitle = "Dashboard";
             }
-        }; // end of initialize with branch data
+        }; //end of initialize dashboard using branch data
 
-        $scope.fetchBranchLoggedComplaintsManual = function () {
-            if ($scope.branchLoggedComplaintsTableState != []) {
-                $scope.fetchBranchLoggedComplaints($scope.branchLoggedComplaintsTableState);
-            }
-        };
-
-        $scope.fetchBranchLoggedComplaints = function (tableState) {
-            if (typeof tableState.pagination == "undefined") {
-                tableState.pagination = [];
-                tableState.pagination.start = 0;
-                tableState.pagination.number = 10;
-                tableState.search = [];
-            }
-            $scope.branchLoggedComplaintsTableState = tableState;
-            var start = tableState.pagination.start || 0;
-            var length = tableState.pagination.number || 10;
-            var search = $.isEmptyObject(tableState.search) ? null : tableState.search;
-            var searchArray = [];
-            if (search) {
-                search = search.predicateObject;
-                $.each(search, function (key, value) {
-                    searchArray.push({columnName: key, value: value});
-                });
-            }
-
-            var request = {
-                start: start,
-                length: length,
-                sort: $.isEmptyObject(tableState.sort) ? null : tableState.sort,
-                search: searchArray,
-                branches: $scope.branchCodesForTable
-            };
-
-            TransferRecallDashboardService.fetchBranchLoggedComplaints(
-                function (data) {
-                    $scope.branchLoggedComplaints = data.data;
-                    tableState.pagination.numberOfPages = data.totalPages;
-                    $scope.isBranchLoggedComplaintsLoading = false;
-                },
-                function (data) {
-                },
-                request
-            );
-        }; // end of fetch branch logged complaints
-
-
-        // Get Personnel at User's Branch
-        $scope.getBranchUsers = function (branchCodes) {
-
-            if ($scope.trLoadCounter <= 0) { // Initialization has finished
-                $scope.showProgress(true, "Fetching Branch Users.");
-            }
-
-            TransferRecallDashboardService.getBranchUsers(
-                    branchCodes,
-                    function (data, status) {
-                        if (status == 200 || status == 201) {
-                            $scope.currentBranchUsers = data;
-                        } else {
-                            PNotifyService.error("Failed to get branch users.");
-                        }
-                        if ($scope.trLoadCounter <= 0) { // Initialization has finished
-                            $scope.showProgress(false);
-                        }
-                        $scope.trLoadCounter--;
-                    },
-                    function (data, status) {
-                        PNotifyService.error(data.description);
-                        if ($scope.trLoadCounter <= 0) { // Initialization has finished
-                            $scope.showProgress(false);
-                        }
-                        $scope.trLoadCounter--;
-                    });
-        };
 
         // Get User's Branch's Statistical Data for Assigned Complaints (Info Dashboard Only)
-        $scope.getGroupInfoComplaintStatisticsData = function (staffId) {
+        $scope.fetchGroupInfoComplaintStatisticsData = function (userBranches) {
             if ($scope.trLoadCounter <= 0) {
                 $scope.showProgress(true, "Fetching Branches Complaint Statistics...");
             }
+
+            var formData = new FormData();
+
+            if($scope.isAdminOrAuthorizer()){
+
+                formData.append("role", "admin");
+                formData.append("branches", userBranches)
+            }else if($scope.isInputter() || $scope.isViewer()){
+
+                formData.append("role", "non-admin");
+                formData.append("branches", angular.toJson(userBranches))
+            }else if($scope.isBranchAdmin()){
+
+                console.log("To be worked on later ::");
+                // formData.append("role", "branch-admin");
+                // formData.append("branches", userBranches)
+            }
+
             TransferRecallDashboardService.getGroupInfoComplaintStatisticsData(
-                staffId,
+                formData,
                 function (data, status) {
                     if (status == 200 || status == 201) {
                         $scope.groupInfoComplaintStatistics = data;
@@ -371,90 +367,433 @@ app.controller('TransferRecallDashboardController', ['$scope', '$sce', '$rootSco
             );
         };
 
-        //Get Statistics for Branches Complaints (Across Branches)
-        $scope.getBranchesComplaintsStatistics = function (branches, dateRange) {
+        //Retrieve Complaints
+        $scope.getComplaints = function(){
 
-            var requestBody = {
+            //check if it is authorizer or admin
+            if($scope.isAdminOrAuthorizer()){
+
+                $scope.getInterRecallComplaints();
+                $scope.getIntraRecallComplaints();
+                $scope.getProcessingRecallComplaints();
+                $scope.getResolvedRecallComplaints();
+                $scope.getDeclinedRecallComplaints();
+
+            }else if($scope.isInputter() || $scope.isViewer()){
+
+                $scope.getBranchRecallComplaints();
+                $scope.getPersonalLoggedComplaints();
+
+            }else if($scope.isBranchAdmin()){
+
+                $scope.getBranchRecallComplaints();
+            }
+
+        }; //end of retrieve complaints
+
+        // Inter Recall Complaints
+        $scope.isInterRecallComplaintsLoading = true;
+        $scope.interRecallComplaints = [];
+        $scope.interRecallComplaintsTableState = [];
+        $scope.getInterRecallComplaints = function(tableState){
+                if (typeof tableState.pagination == "undefined") {
+                    tableState.pagination = [];
+                    tableState.pagination.start = 0;
+                    tableState.pagination.number = 15;
+                    tableState.search = [];
+                }
+
+                $scope.interRecallComplaintsTableState = tableState;
+
+                var start = tableState.pagination.start || 0;
+                var length = tableState.pagination.number || 15;
+                var search = $.isEmptyObject(tableState.search) ? null : tableState.search;
+                var searchArray = [];
+                var role = null;
+                var recallType = "inter";
+                var processingState = 0;
+                var branches = [];
+                branches.push($scope.currentUser.branchCode);
+
+                if (search) {
+                    search = search.predicateObject;
+                    $.each(search, function (key, value) {
+                        searchArray.push({columnName: key, value: value});
+                    });
+                }
+
+                var request = {
+                    start: start,
+                    length: length,
+                    sort: $.isEmptyObject(tableState.sort) ? null : tableState.sort,
+                    search: searchArray,
+                    branches: branches,
+                    role: role,
+                    recallType: recallType,
+                    processingState: processingState
+                };
+
+                TransferRecallDashboardService.fetchAdminOrAuthorizerComplaints(
+                    function (data) {
+                        $scope.interRecallComplaints = data.data;
+                        tableState.pagination.numberOfPages = data.totalPages;
+                        $scope.isInterRecallComplaintsLoading  = false;
+                    },
+                    function (data) {
+                    },
+                    request
+                );
+        } //end of get inter-recall complaints
+
+        // Intra Recall Complaints
+        $scope.isIntraRecallComplaintsLoading = true;
+        $scope.intraRecallComplaints = [];
+        $scope.intraRecallComplaintsTableState = [];
+        $scope.getIntraRecallComplaints = function(tableState){
+            if (typeof tableState.pagination == "undefined") {
+                tableState.pagination = [];
+                tableState.pagination.start = 0;
+                tableState.pagination.number = 15;
+                tableState.search = [];
+            }
+
+            $scope.intraRecallComplaintsTableState = tableState;
+
+            var start = tableState.pagination.start || 0;
+            var length = tableState.pagination.number || 15;
+            var search = $.isEmptyObject(tableState.search) ? null : tableState.search;
+            var searchArray = [];
+            var role = null;
+            var recallType = "intra";
+            var processingState = 0;
+            var branches = [];
+            branches.push($scope.currentUser.branchCode);
+
+            if (search) {
+                search = search.predicateObject;
+                $.each(search, function (key, value) {
+                    searchArray.push({columnName: key, value: value});
+                });
+            }
+
+            var request = {
+                start: start,
+                length: length,
+                sort: $.isEmptyObject(tableState.sort) ? null : tableState.sort,
+                search: searchArray,
                 branches: branches,
-                dateRange: dateRange
+                role: role,
+                recallType: recallType,
+                processingState: processingState
             };
 
-            if ($scope.trLoadCounter <= 0) { // Initialization has finished
-                $scope.showProgress(true, "Fetching Branch Stats.");
-            }
-            TransferRecallDashboardService.getBranchesComplaintsStatistics(
-                requestBody,
-                function (data, status) {
-                    if (status == 200 || status == 201) {
-                        $scope.branchesComplaintStatistics = data;
-                        $scope.setBranchesComplaintsBarChartStatistics($scope.branchesComplaintStatistics);
-                    } else {
-                        $scope.trError = true;
-                        $scope.trErrorMessage = "Failed to get branch stats.";
-                    }
-                    if ($scope.trLoadCounter <= 0) { // Initialization has finished
-                        $scope.showProgress(false);
-                    }
-                    $scope.trLoadCounter--;
+            TransferRecallDashboardService.fetchAdminOrAuthorizerComplaints(
+                function (data) {
+                    $scope.intraRecallComplaints = data.data;
+                    tableState.pagination.numberOfPages = data.totalPages;
+                    $scope.isIntraRecallComplaintsLoading  = false;
                 },
-                function (data, status) {
-                    $scope.trError = true;
-                    PNotifyService.error(data.description);
-                    if ($scope.trLoadCounter <= 0) { // Initialization has finished
-                        $scope.showProgress(false);
-                    }
-                    $scope.trLoadCounter--;
-                }
+                function (data) {
+                },
+                request
             );
+        } //end of get intra recall complaints
+
+        // Processing Recall Complaints
+        $scope.processingRecallComplaintsLoading = true;
+        $scope.processingRecallComplaints = [];
+        $scope.processingRecallComplaintsTableState = [];
+        $scope.getProcessingRecallComplaints = function(tableState){
+            if (typeof tableState.pagination == "undefined") {
+                tableState.pagination = [];
+                tableState.pagination.start = 0;
+                tableState.pagination.number = 15;
+                tableState.search = [];
+            }
+
+            $scope.processingRecallComplaintsTableState = tableState;
+
+            var start = tableState.pagination.start || 0;
+            var length = tableState.pagination.number || 15;
+            var search = $.isEmptyObject(tableState.search) ? null : tableState.search;
+            var searchArray = [];
+            var role = null;
+            var recallType = null;
+            var processingState = 1;
+            var branches = [];
+            branches.push($scope.currentUser.branchCode);
+
+            if (search) {
+                search = search.predicateObject;
+                $.each(search, function (key, value) {
+                    searchArray.push({columnName: key, value: value});
+                });
+            }
+
+            var request = {
+                start: start,
+                length: length,
+                sort: $.isEmptyObject(tableState.sort) ? null : tableState.sort,
+                search: searchArray,
+                branches: branches,
+                role: role,
+                recallType: recallType,
+                processingState: processingState
+            };
+
+            TransferRecallDashboardService.fetchAdminOrAuthorizerComplaints(
+                function (data) {
+                    $scope.processingRecallComplaints = data.data;
+                    tableState.pagination.numberOfPages = data.totalPages;
+                    $scope.processingRecallComplaintsLoading  = false;
+                },
+                function (data) {
+                },
+                request
+            );
+        } //end of get processing recall complaints
+
+        // Resolved Recall Complaints
+        $scope.resolvedRecallComplaintsLoading = true;
+        $scope.resolvedRecallComplaints = [];
+        $scope.resolvedRecallComplaintsTableState = [];
+        $scope.getResolvedRecallComplaints = function(tableState){
+            if (typeof tableState.pagination == "undefined") {
+                tableState.pagination = [];
+                tableState.pagination.start = 0;
+                tableState.pagination.number = 15;
+                tableState.search = [];
+            }
+
+            $scope.resolvedRecallComplaintsTableState = tableState;
+
+            var start = tableState.pagination.start || 0;
+            var length = tableState.pagination.number || 15;
+            var search = $.isEmptyObject(tableState.search) ? null : tableState.search;
+            var searchArray = [];
+            var role = null;
+            var recallType = null;
+            var processingState = 2;
+            var branches = [];
+            branches.push($scope.currentUser.branchCode);
+
+            if (search) {
+                search = search.predicateObject;
+                $.each(search, function (key, value) {
+                    searchArray.push({columnName: key, value: value});
+                });
+            }
+
+            var request = {
+                start: start,
+                length: length,
+                sort: $.isEmptyObject(tableState.sort) ? null : tableState.sort,
+                search: searchArray,
+                branches: branches,
+                role: role,
+                recallType: recallType,
+                processingState: processingState
+            };
+
+            TransferRecallDashboardService.fetchAdminOrAuthorizerComplaints(
+                function (data) {
+                    $scope.resolvedRecallComplaints = data.data;
+                    tableState.pagination.numberOfPages = data.totalPages;
+                    $scope.resolvedRecallComplaintsLoading  = false;
+                },
+                function (data) {
+                },
+                request
+            );
+        } //end of get resolved recall complaints
+
+        // Resolved Recall Complaints
+        $scope.declinedRecallComplaintsLoading = true;
+        $scope.declinedRecallComplaints = [];
+        $scope.declinedRecallComplaintsTableState = [];
+        $scope.getDeclinedRecallComplaints = function(tableState){
+            if (typeof tableState.pagination == "undefined") {
+                tableState.pagination = [];
+                tableState.pagination.start = 0;
+                tableState.pagination.number = 15;
+                tableState.search = [];
+            }
+
+            $scope.declinedRecallComplaintsTableState = tableState;
+
+            var start = tableState.pagination.start || 0;
+            var length = tableState.pagination.number || 15;
+            var search = $.isEmptyObject(tableState.search) ? null : tableState.search;
+            var searchArray = [];
+            var role = null;
+            var recallType = null;
+            var processingState = 2;
+            var branches = [];
+            branches.push($scope.currentUser.branchCode);
+
+            if (search) {
+                search = search.predicateObject;
+                $.each(search, function (key, value) {
+                    searchArray.push({columnName: key, value: value});
+                });
+            }
+
+            var request = {
+                start: start,
+                length: length,
+                sort: $.isEmptyObject(tableState.sort) ? null : tableState.sort,
+                search: searchArray,
+                branches: branches,
+                role: role,
+                recallType: recallType,
+                processingState: processingState
+            };
+
+            TransferRecallDashboardService.fetchAdminOrAuthorizerComplaints(
+                function (data) {
+                    $scope.declinedRecallComplaints = data.data;
+                    tableState.pagination.numberOfPages = data.totalPages;
+                    $scope.declinedRecallComplaintsLoading  = false;
+                },
+                function (data) {
+                },
+                request
+            );
+        } //end of get resolved recall complaints
+
+        // Branch Recall Complaints
+        $scope.isBranchRecallComplaintsLoading = true;
+        $scope.branchRecallComplaints = [];
+        $scope.branchRecallComplaintsTableState = [];
+        $scope.getBranchRecallComplaints = function(tableState){
+            if (typeof tableState.pagination == "undefined") {
+                tableState.pagination = [];
+                tableState.pagination.start = 0;
+                tableState.pagination.number = 15;
+                tableState.search = [];
+            }
+
+            $scope.branchRecallComplaintsTableState = tableState;
+
+            var start = tableState.pagination.start || 0;
+            var length = tableState.pagination.number || 15;
+            var search = $.isEmptyObject(tableState.search) ? null : tableState.search;
+            var searchArray = [];
+            var role = null;
+            var recallType = null;
+            var processingState = 0;
+            var staffId = null;
+            var branches = [];
+            branches.push($scope.currentUser.branchCode);
+
+            if (search) {
+                search = search.predicateObject;
+                $.each(search, function (key, value) {
+                    searchArray.push({columnName: key, value: value});
+                });
+            }
+
+            var request = {
+                start: start,
+                length: length,
+                sort: $.isEmptyObject(tableState.sort) ? null : tableState.sort,
+                search: searchArray,
+                branches: branches,
+                role: role,
+                recallType: recallType,
+                processingState: processingState,
+                staffId: staffId
+            };
+
+            TransferRecallDashboardService.fetchBranchLoggedComplaints(
+                function (data) {
+                    $scope.branchRecallComplaints = data.data;
+                    tableState.pagination.numberOfPages = data.totalPages;
+                    $scope.isBranchRecallComplaintsLoading = false;
+                },
+                function (data) {
+                },
+                request
+            );
+        } //end of get branch recall complaints
+
+        // Personal Complaints
+        $scope.isPersonalRecallComplaintsLoading = true;
+        $scope.personalRecallComplaints = [];
+        $scope.personalRecallComplaintsTableState = [];
+        $scope.getPersonalLoggedComplaints = function(tableState){
+            if (typeof tableState.pagination == "undefined") {
+                tableState.pagination = [];
+                tableState.pagination.start = 0;
+                tableState.pagination.number = 15;
+                tableState.search = [];
+            }
+
+            $scope.personalRecallComplaintsTableState = tableState;
+
+            var start = tableState.pagination.start || 0;
+            var length = tableState.pagination.number || 15;
+            var search = $.isEmptyObject(tableState.search) ? null : tableState.search;
+            var searchArray = [];
+            var role = null;
+            var recallType = null;
+            var processingState = 0;
+            var staffId = $scope.currentUser.staffId;
+            var branches = [];
+
+            if (search) {
+                search = search.predicateObject;
+                $.each(search, function (key, value) {
+                    searchArray.push({columnName: key, value: value});
+                });
+            }
+
+            var request = {
+                start: start,
+                length: length,
+                sort: $.isEmptyObject(tableState.sort) ? null : tableState.sort,
+                search: searchArray,
+                branches: branches,
+                role: role,
+                recallType: recallType,
+                processingState: processingState,
+                staffId: staffId
+            };
+
+            //var jsonRequest = angular.toJson(request);
+
+            TransferRecallDashboardService.fetchBranchLoggedComplaints(
+                function (data) {
+                    $scope.personalRecallComplaints = data.data;
+                    tableState.pagination.numberOfPages = data.totalPages;
+                    $scope.isPersonalRecallComplaintsLoading = false;
+                },
+                function (data) {
+                },
+                request
+            );
+        } //end of get personal recall complaints
+
+
+        /*
+        * SHOW COMPLAINT INFO
+        * */
+        $scope.openFrom = "";
+        $scope.showComplaintInfo = function (complaint, openFrom) {
+            $scope.currentTreatComplaint = complaint;
+            $scope.openFrom = openFrom;
+
+            if (openFrom != "none") {
+                $('#' + openFrom).modal('show');
+            }
         };
 
-        $scope.setGroupStatisticsVariables = function (stats) {
-            $scope.groupUnassignedIntraComplaints = stats.unassignedIntraComplaints;
-            $scope.groupAssignedIntraComplaints = stats.assignedIntraComplaints;
-            $scope.groupUnassignedInterComplaints = stats.unassignedInterComplaints;
-            $scope.groupAssignedInterComplaints = stats.assignedInterComplaints;
-            $scope.groupProcessingInterComplaints = stats.processingInterComplaints;
-            $scope.groupProcessingIntraComplaints = stats.processingIntraComplaints;
-            $scope.groupBranchComplaintsHistory = stats.branchComplaintsHistory;
-            $scope.groupResolvedCount = stats.resolvedCount;
+        $scope.dismiss = function () {
+            $scope.openFrom = "";
+            $('#' + $scope.openFrom).modal('hide');
         };
+        /* END SHOW COMPLAINT INFO */
 
-        $scope.setPersonalStatisticsVariables = function (stats) {
-            $scope.personalUnassignedIntraComplaints = stats.unassignedIntraComplaints;
-            $scope.personalAssignedIntraComplaints = stats.assignedIntraComplaints;
-            $scope.personalUnassignedInterComplaints = stats.unassignedInterComplaints;
-            $scope.personalAssignedInterComplaints = stats.assignedInterComplaints;
-            $scope.personalProcessingInterComplaints = stats.processingInterComplaints;
-            $scope.personalProcessingIntraComplaints = stats.processingIntraComplaints;
-            $scope.personalBranchComplaintsHistory = stats.branchComplaintsHistory;
-            $scope.personalResolvedCount = stats.resolvedCount;
-        };
-
-        $scope.setBranchesComplaintsBarChartStatistics = function (statistics) {
-
-            $scope.branchesComplaintsTotal = statistics.total;
-            $scope.branchesComplaintsTotalResolvedInter = statistics.totalResolvedInter;
-            $scope.branchesComplaintsTotalResolvedIntra = statistics.totalResolvedIntra;
-            $scope.branchesComplaintsTotalUnassignedInter = statistics.totalUnassignedInter;
-            $scope.branchesComplaintsTotalUnassignedIntra = statistics.totalUnassignedIntra;
-            $scope.branchesComplaintsTotalPendingInter = statistics.totalPendingInter;
-            $scope.branchesComplaintsTotalPendingIntra = statistics.totalPendingIntra;
-
-            $scope.branchesComplaintsBarChart.data = [
-                [
-                    $scope.branchesComplaintsTotalResolvedInter,
-                    $scope.branchesComplaintsTotalResolvedIntra,
-                    $scope.branchesComplaintsTotalUnassignedInter,
-                    $scope.branchesComplaintsTotalUnassignedIntra,
-                    $scope.branchesComplaintsTotalPendingInter,
-                    $scope.branchesComplaintsTotalPendingIntra
-                ]
-            ];
-        };
-
-        $scope.isHeadOffice = function () {
-            return AuthServerProvider.isInRole('as_tr_view_all') || AuthServerProvider.isInRole('as_tr_view_module')
-        };
     }
 ]);
 
@@ -465,24 +804,47 @@ app.service('TransferRecallDashboardService', ['$http', '$stateParams', 'APIServ
         this.getUserDetails = function (successHandler, errorHandler) {
             APIServiceHandler.handleAPICall($http.get(TRANSFER_RECALL_SERVICE_HOST + "/api/v1/user-details"), successHandler, errorHandler);
         };
-        this.getPersonalInfoComplaintStatisticsData = function (staffId, successHandler, errorHandler) {
-            APIServiceHandler.handleAPICall($http.get(TRANSFER_RECALL_SERVICE_HOST + "/api/v1/user-info-complaint-stats/" + staffId), successHandler, errorHandler);
-        };
         this.getUserBranches = function (successHandler, errorHandler) {
             APIServiceHandler.handleAPICall($http.get(TRANSFER_RECALL_SERVICE_HOST + "/api/v1/user-branches"), successHandler, errorHandler);
-        };
-        this.fetchBranchLoggedComplaints = function (successHandler, errorHandler, data) {
-            APIServiceHandler.handleAPICall($http.post(TRANSFER_RECALL_SERVICE_HOST + "/api/v1/branch-logged-complaints", data), successHandler, errorHandler);
         };
         this.getBranchUsers = function (data, successHandler, errorHandler) {
             APIServiceHandler.handleAPICall($http.post(TRANSFER_RECALL_SERVICE_HOST + "/api/v1/branch-users", data), successHandler, errorHandler);
         };
-        this.getGroupInfoComplaintStatisticsData = function (data, successHandler, errorHandler) {
-            APIServiceHandler.handleAPICall($http.post(TRANSFER_RECALL_SERVICE_HOST + "/api/v1/group-info-complaint-stats", data), successHandler, errorHandler);
-        };
         this.getBranchesComplaintsStatistics = function (data, successHandler, errorHandler) {
             APIServiceHandler.handleAPICall($http.post(TRANSFER_RECALL_SERVICE_HOST + "/api/v1/branches-complaints-stats", data), successHandler, errorHandler);
         };
+        this.fetchBranchLoggedComplaints = function (successHandler, errorHandler, data) {
+            APIServiceHandler.handleAPICall($http.post(TRANSFER_RECALL_SERVICE_HOST + "/api/v1/branch-logged-complaints", data), successHandler, errorHandler);
+        };
+        this.fetchAdminOrAuthorizerComplaints = function (successHandler, errorHandler, data) {
+            APIServiceHandler.handleAPICall($http.post(TRANSFER_RECALL_SERVICE_HOST + "/api/v1/complaints-admin", data), successHandler, errorHandler);
+        };
+
+        this.getPersonalInfoComplaintStatisticsData = function (data, successHandler, errorHandler) {
+
+            var httpVar = $http({
+                method: 'POST',
+                url: TRANSFER_RECALL_SERVICE_HOST + "/api/v1/user-info-complaint-stats",
+                data: data,
+                headers: {'Content-Type': undefined}
+            });
+
+            APIServiceHandler.handleAPICall(httpVar, successHandler, errorHandler);
+        };
+
+        this.getGroupInfoComplaintStatisticsData = function (data, successHandler, errorHandler) {
+
+            var httpVar = $http({
+                method: 'POST',
+                url: TRANSFER_RECALL_SERVICE_HOST + "/api/v1/group-info-complaint-stats",
+                data: data,
+                headers: {'Content-Type': undefined}
+            });
+
+            APIServiceHandler.handleAPICall(httpVar, successHandler, errorHandler);
+
+        };
+
     }
 ]);
 

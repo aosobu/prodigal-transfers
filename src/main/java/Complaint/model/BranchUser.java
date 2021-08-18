@@ -25,5 +25,6 @@ public class BranchUser {
     private String staffId;
     private String staffName;
     private String branchCode;
+    private String email;
 
 }

@@ -500,8 +500,8 @@
                                                                     <div class="col-sm-6">
                                                                         <label for="beneficiaryBank">Beneficiary Bank <span class="required">*</span></label>
                                                                         <select ng-model="customerStep3.beneficiaryFI"
-                                                                                ng-options="bank as bank.bankName for bank in banks track by bank.bankCode"
-                                                                                ng-value="bank.bankCode"
+                                                                                ng-options="bank as bank.bankAbbreviation for bank in banks track by bank.bankAbbreviation"
+                                                                                ng-value="bank.bankName"
                                                                                 class="form-control"
                                                                                 id="beneficiaryBank"
                                                                                 name="beneficiaryBank" required></select>
@@ -510,7 +510,6 @@
                                                                 </div>
                                                                 <!-- Beneficiary Bank -->
 
-                                                                <!-- Beneficiary Name -->
                                                                 <div class="row">
                                                                     <div class="col-sm-12">
                                                                         <label for="beneficiaryAcctNum">Beneficiary Account Number <span class="required">*</span></label>
@@ -521,7 +520,7 @@
                                                                                ng-minlength="10" ng-maxlength="10"
                                                                                ng-pattern="/^\+?[0-9]*$/">
                                                                         <small class="error" ng-show="createComplaintForm.beneficiaryAcctNum.$error.required && createComplaintForm.beneficiaryAcctNum.$dirty">This field is required</small>
-                                                                        <small class="error" ng-show="!createComplaintForm.beneficiaryAcctNum.$error.required && (createComplaintForm.beneficiaryAcctNum.$error.minlength || createComplaintForm.beneficiaryAcctNum.$error.maxlength) && createComplaintForm.beneficiaryAcctNum.$dirty">Phone no. cannot be more or less than 11 characters</small>
+                                                                        <small class="error" ng-show="!createComplaintForm.beneficiaryAcctNum.$error.required && (createComplaintForm.beneficiaryAcctNum.$error.minlength || createComplaintForm.beneficiaryAcctNum.$error.maxlength) && createComplaintForm.beneficiaryAcctNum.$dirty">Account no. cannot be more or less than 10 characters</small>
                                                                         <small class="error" ng-show="!createComplaintForm.beneficiaryAcctNum.$error.minLength && !createComplaintForm.beneficiaryAcctNum.$error.maxLength && createComplaintForm.beneficiaryAcctNum.$error.pattern && createComplaintForm.beneficiaryAcctNum.$dirty">Numbers only.</small>
                                                                     </div>
                                                                 </div>
@@ -545,7 +544,7 @@
 
                                                                 <div class="row">
                                                                     <div class="col-sm-12">
-                                                                        <label for="petitionerPrayer">Petitioner's Prayer <span class="required">*</span></label>
+                                                                        <label for="petitionerPrayer">Comment <span class="required">*</span></label>
                                                                         <textarea rows="5" ng-model="customerStep3.complainantPrayer"
                                                                                   class="form-control"
                                                                                   id="petitionerPrayer"
@@ -558,20 +557,18 @@
                                                                         </textarea>
                                                                     </div>
                                                                 </div>
-                                                                <!-- Petitioner's Prayer -->
+                                                                <!-- Comment -->
 
                                                                 <!--- customer instruction -->
                                                                 <div class="row">
                                                                     <div class="col-sm-12">
                                                                         <label for="customerInstruction">Upload Customer Instruction <span class="required">*</span></label>
-                                                                        <input name="customerInstruction"
+                                                                        <input file-model="fileCustomerInstruction.instruction"
                                                                                type="file"
                                                                                class="form-control"
                                                                                id="customerInstruction"
-                                                                               accept=".pdf,.doc,.txt"
-                                                                               file-model="fileContent.customerInstruction"
-                                                                               ng-mouseleave="!checkCustomerInstruction()">
-                                                                        <small class="error" ng-show="!checkCustomerInstruction()">This field is required</small>
+                                                                               accept=".pdf"
+                                                                               ng-mouseleave="fileEvent()">
                                                                     </div>
                                                                 </div>
                                                                 <!-- customer instruction -->

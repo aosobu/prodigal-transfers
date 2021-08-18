@@ -22,4 +22,5 @@ public class DataTableRequest {
     private String role;
     private String recallType;
     private Long processingState;
+    private String staffId;
 }

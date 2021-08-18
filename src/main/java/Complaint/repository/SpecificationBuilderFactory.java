@@ -29,7 +29,7 @@ public class SpecificationBuilderFactory {
         List<String> branches = request.getBranches();
         Specifications<Complaint> specification = null;
         if(!branches.isEmpty()){
-            specification = Specifications.where(ComplaintSpecsBranch.branchLoggedBase(branches, null));
+            return Specifications.where(ComplaintSpecsBranch.branchLoggedBase(branches, null));
         }
         if(staffId != null){
             specification =  Specifications.where(ComplaintSpecsBranch.branchLoggedBase(null, staffId));

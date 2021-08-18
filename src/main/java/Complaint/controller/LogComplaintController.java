@@ -25,7 +25,6 @@ public class LogComplaintController {
     private TransactionService transactionService;
     private CustomerService customerService;
     private BankServiceImpl bankServiceImpl;
-    private Logger logger = LoggerFactory.getLogger(LogComplaintController.class);
 
     @RequestMapping(value = "complaint-transactions", method = RequestMethod.POST)
     public

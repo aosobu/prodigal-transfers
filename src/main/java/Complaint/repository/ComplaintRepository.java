@@ -27,4 +27,5 @@ public interface ComplaintRepository extends JpaRepository<Complaint, Long>, Jpa
     Long countAllByComplaintStateProcessingState(Long processingState);
     Long countAllByComplaintStateProcessingStateAndRecallType(Long processingState, String recallType);
     List<Complaint> getAllByComplaintStateProcessingStateAndRecallTypeAndApprovalStatus(Long processingState, String recallType, int approvalStatus);
+    Long  countAllByBranchCodeLogged(String branchCodeLogged);
 }

@@ -24,6 +24,12 @@
                 "name": "AS_TRANSFER_RECALL_VIEW_ONLY",
                 "friendlyName": "Transfer Recall View Only"
             }
+        },
+        {
+            "role": {
+                "name": "AS_TRANSFER_RECALL_BRANCH_ADMIN",
+                "friendlyName": "Transfer Recall Branch Admin"
+            }
         }
     ],
     "applicationAuthorities": [
@@ -75,6 +81,13 @@
                 "friendlyName": "View Transfer Recall Module",
                 "description": "View Transfer Recall module"
             }
+        },
+        {
+          "authority": {
+            "authority": "as_tr_branch_admin",
+            "friendlyName": "View Authorize and Approve Module",
+            "description": "View Transfer Recall module"
+          }
         }
     ],
     "applicationRoleAuthorities": [
@@ -109,6 +122,15 @@
           "role": "AS_TRANSFER_RECALL_VIEW_ONLY",
           "authorities": [
             "as_tr_view_all"
+          ]
+        },
+        {
+          "role": "AS_TRANSFER_RECALL_BRANCH_ADMIN",
+          "authorities": [
+            "as_tr_view_module",
+            "as_tr_resolve_complaint",
+            "as_tr_approve_complaint",
+            "as_tr_branch_admin"
           ]
         }
     ]

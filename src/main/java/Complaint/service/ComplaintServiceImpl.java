@@ -6,6 +6,7 @@ import Complaint.model.api.DataTableColumn;
 import Complaint.model.api.DataTableOrder;
 import Complaint.model.api.DataTableRequest;
 import Complaint.repository.ComplaintRepository;
+import Complaint.repository.ComplaintSpecsBranch;
 import Complaint.repository.SpecificationBuilderFactory;
 import Complaint.service.interfaces.ComplaintService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class ComplaintServiceImpl implements ComplaintService {
 
     @Override
     public Long countAllComplaintsByBranchCode(String branchCode) {
-        return complaintRepository.countAllByBranchUserBranchCode(branchCode);
+        return complaintRepository.countAllByBranchCodeLogged(branchCode);
     }
 
     @Override
@@ -152,7 +153,7 @@ public class ComplaintServiceImpl implements ComplaintService {
             String keyword = column.getValue();
             if (StringUtils.hasText(keyword)) {
                 switch (columnName) {
-
+                    case "trackingNumber": searchSpecs = searchSpecs.and(ComplaintSpecsBranch.base(0l, null));
                 }
             }
         }

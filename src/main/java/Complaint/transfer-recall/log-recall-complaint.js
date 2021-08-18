@@ -33,10 +33,11 @@ app.controller('NIPRecallNewComplaintController', ['$scope', '$rootScope', '$sta
         $scope.customerStep3 = [];
 
         $scope.selectComplaintReason = {};
-
-
         $scope.banks = [];
-        $scope.fileContent = "";
+
+        $scope.fileCustomerInstruction = {};
+        $scope.fileName = "";
+        $scope.fileObject = "";
 
         /** hide alert **/
         $scope.hideAlert = function (){
@@ -84,7 +85,7 @@ app.controller('NIPRecallNewComplaintController', ['$scope', '$rootScope', '$sta
                     return false;
 
                 case 3:
-                    return !$scope.createComplaintForm.$invalid && $scope.checkCustomerInstruction();
+                    return !$scope.createComplaintForm.$invalid && $scope.fileName!= "";
 
                 default:
                     return true;
@@ -134,7 +135,6 @@ app.controller('NIPRecallNewComplaintController', ['$scope', '$rootScope', '$sta
             $('#datepickerDateRange').val($scope.step1DateRange);
             $scope.complaintTransactionsStep2 = {};
             $scope.filteredComplaintTransactionsStep2 = {};
-
             $scope.resetStep2();
         };
 
@@ -146,9 +146,8 @@ app.controller('NIPRecallNewComplaintController', ['$scope', '$rootScope', '$sta
            $scope.logComplaintsStep3 = [];
            $scope.customerStep3 = null;
            $scope.selectComplaintReason = {};
-           $scope.fileContent = {};
-
-            $scope.resetStep3();
+           $scope.resetCustomerInstructionElement();
+           $scope.resetStep3();
         };
 
         $scope.resetStep3 = function(){
@@ -163,7 +162,7 @@ app.controller('NIPRecallNewComplaintController', ['$scope', '$rootScope', '$sta
 
             $scope.complaintTransactionsStep3 = {};
             $scope.logComplaintsStep3 = [];
-            $scope.fileContent = {};
+            $scope.resetCustomerInstructionElement();
 
             if ($scope.customerStep3 != null) {
                 var accountName = $scope.customerStep3.accountName;
@@ -400,18 +399,9 @@ app.controller('NIPRecallNewComplaintController', ['$scope', '$rootScope', '$sta
             );
         };
 
-        $scope.checkCustomerInstruction = function(){;
-            if($scope.fileContent.customerInstruction == "") {
-                return false;
-            }
-            return true;
-        }
-
         //log complaints
         $scope.logComplaints = function () {
             console.log("About to log complaints {} ");
-            // check if logged in user is consultant
-
             // Check Customer Phone and Email
             if ($scope.customerStep3.email == ""){
                 $scope.trLogError = true;
@@ -434,12 +424,14 @@ app.controller('NIPRecallNewComplaintController', ['$scope', '$rootScope', '$sta
 
                     var complaint = {
 
-                        beneficiaryBank : $scope.customerStep3.beneficiaryFI.bankName ,
+                        beneficiaryBank : $scope.customerStep3.beneficiaryFI.bankAbbreviation ,
                         beneficiaryAccountNumber : $scope.customerStep3.beneficiaryAccountNumber ,
                         beneficiaryName : $scope.customerStep3.beneficiaryName ,
                         beneficiaryBankCode : $scope.customerStep3.beneficiaryFI.bankCode ,
                         transferringBankCode : $scope.getTransferringBankCode() ,
                         complaintReason : $scope.customerStep3.complainantPrayer ,
+                        amountTransferred :  txn.amount,
+                        amountToBeRecalled: txn.amount,
                         complaintCustomer : {
                             customerEmail: $scope.customerStep3.email,
                             customerPhoneNumber: $scope.customerStep3.phone ,
@@ -479,12 +471,11 @@ app.controller('NIPRecallNewComplaintController', ['$scope', '$rootScope', '$sta
                         },
                         branchUser: {
                             staffId: "" ,
-                            staffName: $scope.customerStep3.consultantName  ,
+                            staffName: ""  ,
                             branchCode: "" ,
                         },
-                        complaintState:{
-
-                        }
+                        complaintState:{},
+                        complaintInstruction: {}
                     } // end of complaint payload
                 }
 
@@ -494,11 +485,13 @@ app.controller('NIPRecallNewComplaintController', ['$scope', '$rootScope', '$sta
 
             var formData = new FormData();
 
-            formData.append("customerInstruction", $scope.fileContent.customerInstruction);
-            formData.append("customerInstructionName", $scope.fileContent.name);
-            formData.append("complaints", angular.toJson($scope.logComplaintsStep3));
+            //stop form submission if file objects and file names are empty
 
-            //formData.append("filesNames[]", $scope.fileContent.customerInstruction.name);
+            if($scope.fileObject)
+                formData.append("customerInstruction", $scope.fileObject);
+            if($scope.fileName)
+                formData.append("customerInstructionName", $scope.fileName);
+            formData.append("complaints", angular.toJson($scope.logComplaintsStep3));
 
             if(count > 0) {
                 $scope.showProgress(true, "Logging Recall Complaint(s)...");
@@ -506,10 +499,16 @@ app.controller('NIPRecallNewComplaintController', ['$scope', '$rootScope', '$sta
                     formData,
                     function (data, status) {
                         if (status == 200 || status == 201) {
-                            $scope.trLogSuccess = true;
-                            $scope.trLogSuccessMessage = "Complaint(s) Logged Successfully!";
+                            if(data[0].errorMessage == null){
+                                $scope.trLogSuccess = true;
+                                $scope.trLogSuccessMessage = "Complaint(s) Logged Successfully!";
+                                $scope.showProgress(false);
+                            }else{
+                                $scope.trLogError = true;
+                                $scope.trLogErrorMessage = data[0].errorMessage;
+                                $scope.showProgress(false);
+                            }
                         }
-                        $scope.showProgress(false);
                     },
                     function (data, status) {
                         $scope.trLogError = true;
@@ -528,7 +527,7 @@ app.controller('NIPRecallNewComplaintController', ['$scope', '$rootScope', '$sta
         $scope.getTransferringBankCode = function(){
             var bankSize = $scope.banks.length;
             for(i=0; i<bankSize; i++){
-                if($scope.banks[i].bankAbbreviation == "FBL")
+                if($scope.banks[i].bankName.toLowerCase() == "FBL".toLowerCase())
                     return $scope.banks[i].bankCode;
             }
         }
@@ -539,6 +538,17 @@ app.controller('NIPRecallNewComplaintController', ['$scope', '$rootScope', '$sta
             else
                 return "";
         }
+
+        $scope.fileEvent = function() {
+            console.log("Is event triggered {} ");
+            $scope.fileObject = document.getElementById("customerInstruction").files[0];
+            $scope.fileName = document.getElementById("customerInstruction").files[0].name;
+        }
+
+        $scope.resetCustomerInstructionElement = function(){
+            $scope.fileCustomerInstruction.Name = document.getElementById("customerInstruction").value = null;
+        }
+
 
         /************* static data ****************/
         $scope.countries = [
